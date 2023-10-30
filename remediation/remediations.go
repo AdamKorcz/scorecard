@@ -109,6 +109,7 @@ func CreateDockerfilePinningRemediation(dep *checker.Dependency, digester Digest
 
 	hash, err := digester.Digest(name)
 	if err != nil {
+		fmt.Println("err: ", err)
 		return nil
 	}
 
