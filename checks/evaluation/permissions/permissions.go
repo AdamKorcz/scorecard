@@ -23,6 +23,8 @@ import (
 	sce "github.com/ossf/scorecard/v4/errors"
 	"github.com/ossf/scorecard/v4/finding"
 	"github.com/ossf/scorecard/v4/remediation"
+	"github.com/ossf/scorecard/v4/probes/gitHubWorkflowPermissionsStepsNoWrite"
+	"github.com/ossf/scorecard/v4/probes/gitHubWorkflowPermissionsTopNoWrite"
 )
 
 //go:embed *.yml
@@ -91,24 +93,28 @@ const (
 )
 
 // TokenPermissions applies the score policy for the Token-Permissions check.
-func TokenPermissions(name string, c *checker.CheckRequest, r *checker.TokenPermissionsData) checker.CheckResult {
-	if r == nil {
-		e := sce.WithMessage(sce.ErrScorecardInternal, "empty raw data")
+func TokenPermissions(name string,
+	findings []finding.Finding,
+	dl checker.DetailLogger,
+) checker.CheckResult {
+	expectedProbes := []string{
+		hasNoGitHubWorkflowPermissionWriteActionsTop.Probe,
+		hasNoGitHubWorkflowPermissionWriteAllTop.Probe,
+		hasNoGitHubWorkflowPermissionWriteChecksTop.Probe,
+		hasNoGitHubWorkflowPermissionWriteContentsTop.Probe,
+		hasNoGitHubWorkflowPermissionWriteDeploymentsTop.Probe,
+		hasNoGitHubWorkflowPermissionWritePackagesTop.Probe,
+		hasNoGitHubWorkflowPermissionWriteSecurityEventsTop.Probe,
+		hasNoGitHubWorkflowPermissionWriteStatusesTop.Probe,
+	}
+	if !finding.UniqueProbesEqual(findings, expectedProbes) {
+		e := sce.WithMessage(sce.ErrScorecardInternal, "invalid probe results")
 		return checker.CreateRuntimeErrorResult(name, e)
 	}
 
-	if r.NumTokens == 0 {
-		return checker.CreateInconclusiveResult(name, "no tokens found")
-	}
-
-	// This is a temporary step that should be replaced by probes in ./probes
-	findings, err := rawToFindings(r)
-	if err != nil {
-		e := sce.WithMessage(sce.ErrScorecardInternal, "could not convert raw data to findings")
-		return checker.CreateRuntimeErrorResult(name, e)
-	}
-
-	score, err := applyScorePolicy(findings, c)
+	/*
+	We need to keep this:
+	score, err := applyScorePolicy(findings, dl)
 	if err != nil {
 		return checker.CreateRuntimeErrorResult(name, err)
 	}
@@ -116,7 +122,7 @@ func TokenPermissions(name string, c *checker.CheckRequest, r *checker.TokenPerm
 	if score != checker.MaxResultScore {
 		return checker.CreateResultWithScore(name,
 			"detected GitHub workflow tokens with excessive permissions", score)
-	}
+	}*/
 
 	return checker.CreateMaxScoreResult(name,
 		"GitHub workflow tokens follow principle of least privilege")
@@ -124,7 +130,7 @@ func TokenPermissions(name string, c *checker.CheckRequest, r *checker.TokenPerm
 
 // rawToFindings is a temporary step for converting the raw results
 // to findings. This should be replaced by probes in ./probes.
-func rawToFindings(results *checker.TokenPermissionsData) ([]finding.Finding, error) {
+/*func rawToFindings(results *checker.TokenPermissionsData) ([]finding.Finding, error) {
 	var findings []finding.Finding
 
 	for _, r := range results.TokenPermissions {
@@ -202,7 +208,7 @@ func rawToFindings(results *checker.TokenPermissionsData) ([]finding.Finding, er
 		findings = append(findings, *f)
 	}
 	return findings, nil
-}
+}*/
 
 func permTypeToEnum(tokenName *string) permissionType {
 	if tokenName == nil {
@@ -283,13 +289,12 @@ func newStr(s string) *string {
 	return &s
 }
 
-func applyScorePolicy(findings []finding.Finding, c *checker.CheckRequest) (int, error) {
+func applyScorePolicy(findings []finding.Finding, dl checker.DetailLogger) (int, error) {
 	// See list https://github.blog/changelog/2021-04-20-github-actions-control-permissions-for-github_token/.
 	// Note: there are legitimate reasons to use some of the permissions like checks, deployments, etc.
 	// in CI/CD systems https://docs.travis-ci.com/user/github-oauth-scopes/.
 
 	hm := make(map[string]permissions)
-	dl := c.Dlogger
 	//nolint:errcheck
 	remediationMetadata, _ := remediation.New(c)
 	negativeProbeResults := map[string]bool{
@@ -316,7 +321,14 @@ func applyScorePolicy(findings []finding.Finding, c *checker.CheckRequest) (int,
 				return checker.InconclusiveResultScore,
 					sce.WithMessage(sce.ErrScorecardInternal, "locationType is nil")
 			case permissionLocationTop:
-				warnWithRemediation(dl, remediationMetadata, f, negativeProbeResults)
+
+				logger.Warn(&checker.LogMessage{
+					Finding: f,
+				})
+
+				// Record that we found a negative result.
+				negativeProbeResults[f.Probe] = true
+				//warnWithRemediation(dl, remediationMetadata, f, negativeProbeResults)
 			default:
 				// We warn only for top-level.
 				dl.Debug(&checker.LogMessage{
@@ -329,8 +341,14 @@ func applyScorePolicy(findings []finding.Finding, c *checker.CheckRequest) (int,
 				return checker.InconclusiveResultScore, err
 			}
 
-		case permissionLevelWrite:
-			warnWithRemediation(dl, remediationMetadata, f, negativeProbeResults)
+		case permissionLevelWrite:				
+				logger.Warn(&checker.LogMessage{
+					Finding: f,
+				})
+
+				// Record that we found a negative result.
+				negativeProbeResults[f.Probe] = true
+			//warnWithRemediation(dl, remediationMetadata, f, negativeProbeResults)
 
 			// Group results by workflow name for score computation.
 			if err := updateWorkflowHashMap(hm, f); err != nil {
@@ -380,7 +398,7 @@ func reportFinding(probe, text string, o finding.Outcome, dl checker.DetailLogge
 	return nil
 }
 
-func warnWithRemediation(logger checker.DetailLogger,
+/*func warnWithRemediation(logger checker.DetailLogger,
 	rem *remediation.RemediationMetadata,
 	f *finding.Finding,
 	negativeProbeResults map[string]bool,
@@ -398,7 +416,7 @@ func warnWithRemediation(logger checker.DetailLogger,
 
 	// Record that we found a negative result.
 	negativeProbeResults[f.Probe] = true
-}
+}*/
 
 func recordPermissionWrite(hm map[string]permissions, path string,
 	locType permissionLocationType, permType int,
