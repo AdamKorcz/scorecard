@@ -29,6 +29,9 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
 	//"github.com/ossf/scorecard/v4/remediation"
 )
 
@@ -103,11 +106,65 @@ func TokenPermissions(name string,
 		hasNoGitHubWorkflowPermissionWritePackagesTop.Probe,
 		hasNoGitHubWorkflowPermissionWriteSecurityEventsTop.Probe,
 		hasNoGitHubWorkflowPermissionWriteStatusesTop.Probe,
+		hasGithubWorkflowPermissionUnknown.Probe,
+		hasGithubWorkflowPermissionNone.Probe,
+		hasGithubWorkflowPermissionRead.Probe,
 	}
 	if !finding.UniqueProbesEqual(findings, expectedProbes) {
 		e := sce.WithMessage(sce.ErrScorecardInternal, "invalid probe results")
 		return checker.CreateRuntimeErrorResult(name, e)
 	}
+
+	// Start with a perfect score.
+	score := float32(checker.MaxResultScore)
+	
+	for i := range findings {
+		f := &findings[i]
+		if f.Outcome != finding.OutcomeNegative {
+			continue
+		}
+		switch f.Probe {
+		case hasGithubWorkflowPermissionNone.Probe, hasGithubWorkflowPermissionRead.Probe:
+			dl.Info(&checker.LogMessage{
+				Finding: f,
+			})			
+		case hasGithubWorkflowPermissionUnknown.Probe:
+			dl.Debug(&checker.LogMessage{
+				Finding: f,
+			})			
+		case hasNoGitHubWorkflowPermissionWriteActionsTop.Probe:
+			score -= checker.MaxResultScore
+		case hasNoGitHubWorkflowPermissionWriteAllTop.Probe:
+			// If no top level permissions are defined, all the permissions
+			// are enabled by default. In this case,
+			/*if permissionIsPresentInRunLevel(perms, "all") {
+				// ... give lowest score if no run level permissions are defined either.
+				return checker.MinResultScore
+			}*/
+			// ... reduce score if run level permissions are defined.
+			score -= 0.5
+		case hasNoGitHubWorkflowPermissionWriteChecksTop.Probe:
+			score -= 0.5
+		case hasNoGitHubWorkflowPermissionWriteContentsTop.Probe:
+		case hasNoGitHubWorkflowPermissionWriteDeploymentsTop.Probe:
+			score--
+		case hasNoGitHubWorkflowPermissionWritePackagesTop.Probe:
+			score -= checker.MaxResultScore
+		case hasNoGitHubWorkflowPermissionWriteSecurityEventsTop.Probe:
+			score--
+		case hasNoGitHubWorkflowPermissionWriteStatusesTop.Probe:
+			score -= 0.5
+		}
+	}
+	if score < checker.MinResultScore {
+		score = checker.MinResultScore
+	}
+	fmt.Println("here: ", score)
+	if score != checker.MaxResultScore {
+			return checker.CreateResultWithScore(name,
+				"detected GitHub workflow tokens with excessive permissions", int(score))
+	}
+
 
 	/*
 		We need to keep this:
