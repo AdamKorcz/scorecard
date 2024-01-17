@@ -13,7 +13,7 @@
 // limitations under the License.
 
 //nolint:stylecheck
-package hasNoGitHubWorkflowPermissionWriteActionsTop
+package hasNoGitHubWorkflowPermissionWriteAllRun
 
 import (
 	"embed"
@@ -28,7 +28,7 @@ import (
 //go:embed *.yml
 var fs embed.FS
 
-const Probe = "hasNoGitHubWorkflowPermissionWriteActionsTop"
+const Probe = "hasNoGitHubWorkflowPermissionWriteAllRun"
 
 func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	if raw == nil {
@@ -42,10 +42,10 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 		if r.Type != checker.PermissionLevelWrite {
 			continue
 		}
-		if *r.Name != "actions" {
+		if *r.Name != "all" {
 			continue
 		}
-		if *r.LocationType != checker.PermissionLocationTop {
+		if *r.LocationType != checker.PermissionLocationJob {
 			continue
 		}
 

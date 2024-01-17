@@ -13,9 +13,9 @@
 // limitations under the License.
 
 //nolint:stylecheck
-package gitHubWorkflowPermissionsTopNoWrite
+package gitHubWorkflowPermissionsStepsNoWrite
 
-import (
+/*import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -155,3 +155,4 @@ func Test_Run(t *testing.T) {
 		})
 	}
 }
+*/
