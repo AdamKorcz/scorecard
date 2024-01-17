@@ -15,30 +15,27 @@
 package evaluation
 
 import (
-	"embed"
 	"fmt"
-	"strings"
+	//"strings"
 
 	"github.com/ossf/scorecard/v4/checker"
 	sce "github.com/ossf/scorecard/v4/errors"
 	"github.com/ossf/scorecard/v4/finding"
-	"github.com/ossf/scorecard/v4/remediation"
-	"github.com/ossf/scorecard/v4/probes/gitHubWorkflowPermissionsStepsNoWrite"
-	"github.com/ossf/scorecard/v4/probes/gitHubWorkflowPermissionsTopNoWrite"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
+	//"github.com/ossf/scorecard/v4/remediation"
 )
-
-//go:embed *.yml
-var probes embed.FS
 
 type permissions struct {
 	topLevelWritePermissions map[string]bool
 	jobLevelWritePermissions map[string]bool
 }
-
-var (
-	stepsNoWriteID = "gitHubWorkflowPermissionsStepsNoWrite"
-	topNoWriteID   = "gitHubWorkflowPermissionsTopNoWrite"
-)
 
 type permissionLevel int
 
@@ -113,16 +110,16 @@ func TokenPermissions(name string,
 	}
 
 	/*
-	We need to keep this:
-	score, err := applyScorePolicy(findings, dl)
-	if err != nil {
-		return checker.CreateRuntimeErrorResult(name, err)
-	}
+		We need to keep this:
+		score, err := applyScorePolicy(findings, dl)
+		if err != nil {
+			return checker.CreateRuntimeErrorResult(name, err)
+		}
 
-	if score != checker.MaxResultScore {
-		return checker.CreateResultWithScore(name,
-			"detected GitHub workflow tokens with excessive permissions", score)
-	}*/
+		if score != checker.MaxResultScore {
+			return checker.CreateResultWithScore(name,
+				"detected GitHub workflow tokens with excessive permissions", score)
+		}*/
 
 	return checker.CreateMaxScoreResult(name,
 		"GitHub workflow tokens follow principle of least privilege")
@@ -258,7 +255,7 @@ func permTypeToName(permType int) *string {
 	return &permName
 }
 
-func createFinding(loct *checker.PermissionLocation, text string, loc *finding.Location) (*finding.Finding, error) {
+/*func createFinding(loct *checker.PermissionLocation, text string, loc *finding.Location) (*finding.Finding, error) {
 	probe := stepsNoWriteID
 	if loct == nil || *loct == checker.PermissionLocationTop {
 		probe = topNoWriteID
@@ -277,7 +274,7 @@ func createFinding(loct *checker.PermissionLocation, text string, loc *finding.L
 		f = f.WithLocation(loc)
 	}
 	return f, nil
-}
+}*/
 
 // avoid memory aliasing by returning a new copy.
 func newUint(u uint) *uint {
@@ -296,10 +293,10 @@ func applyScorePolicy(findings []finding.Finding, dl checker.DetailLogger) (int,
 
 	hm := make(map[string]permissions)
 	//nolint:errcheck
-	remediationMetadata, _ := remediation.New(c)
+	//remediationMetadata, _ := remediation.New(c)
 	negativeProbeResults := map[string]bool{
-		stepsNoWriteID: false,
-		topNoWriteID:   false,
+		"stepsNoWriteID": false,
+		"topNoWriteID":   false,
 	}
 
 	for i := range findings {
@@ -322,7 +319,7 @@ func applyScorePolicy(findings []finding.Finding, dl checker.DetailLogger) (int,
 					sce.WithMessage(sce.ErrScorecardInternal, "locationType is nil")
 			case permissionLocationTop:
 
-				logger.Warn(&checker.LogMessage{
+				dl.Warn(&checker.LogMessage{
 					Finding: f,
 				})
 
@@ -341,13 +338,13 @@ func applyScorePolicy(findings []finding.Finding, dl checker.DetailLogger) (int,
 				return checker.InconclusiveResultScore, err
 			}
 
-		case permissionLevelWrite:				
-				logger.Warn(&checker.LogMessage{
-					Finding: f,
-				})
+		case permissionLevelWrite:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
 
-				// Record that we found a negative result.
-				negativeProbeResults[f.Probe] = true
+			// Record that we found a negative result.
+			negativeProbeResults[f.Probe] = true
 			//warnWithRemediation(dl, remediationMetadata, f, negativeProbeResults)
 
 			// Group results by workflow name for score computation.
@@ -357,23 +354,23 @@ func applyScorePolicy(findings []finding.Finding, dl checker.DetailLogger) (int,
 		}
 	}
 
-	if err := reportDefaultFindings(findings, c.Dlogger, negativeProbeResults); err != nil {
+	/*if err := reportDefaultFindings(findings, dl, negativeProbeResults); err != nil {
 		return checker.InconclusiveResultScore, err
-	}
+	}*/
 	return calculateScore(hm), nil
 }
 
-func reportDefaultFindings(results []finding.Finding,
+/*func reportDefaultFindings(results []finding.Finding,
 	dl checker.DetailLogger, negativeProbeResults map[string]bool,
 ) error {
 	// Workflow files found, report positive findings if no
 	// negative findings were found.
 	// NOTE: we don't consider probe `topNoWriteID`
 	// because positive results are already reported.
-	found := negativeProbeResults[stepsNoWriteID]
+	found := negativeProbeResults["stepsNoWriteID"]
 	if !found {
 		text := fmt.Sprintf("no %s write permissions found", checker.PermissionLocationJob)
-		if err := reportFinding(stepsNoWriteID,
+		if err := reportFinding("stepsNoWriteID",
 			text, finding.OutcomePositive, dl); err != nil {
 			return err
 		}
@@ -396,7 +393,7 @@ func reportFinding(probe, text string, o finding.Outcome, dl checker.DetailLogge
 		Finding: f,
 	})
 	return nil
-}
+}*/
 
 /*func warnWithRemediation(logger checker.DetailLogger,
 	rem *remediation.RemediationMetadata,

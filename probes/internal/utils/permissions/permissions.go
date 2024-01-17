@@ -1,7 +1,9 @@
 package permissions
 
 import (
+	"embed"
 	"fmt"
+	"strings"
 
 	"github.com/ossf/scorecard/v4/checker"
 	sce "github.com/ossf/scorecard/v4/errors"
@@ -167,9 +169,9 @@ func SetOutcomeAndLocation(r checker.TokenPermission, f *finding.Finding) {
 	}
 }
 
-func CreateNegativeFinding(r checker.TokenPermission, Probe string) (*finding.Finding, error) {
+func CreateNegativeFinding(r checker.TokenPermission, Probe string, fs embed.FS) (*finding.Finding, error) {
 		// Create finding
-		text, err := permissions.CreateText(r)
+		text, err := CreateText(r)
 		if err != nil {
 			return nil, fmt.Errorf("create finding: %w", err)
 		}

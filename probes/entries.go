@@ -62,6 +62,14 @@ import (
 	"github.com/ossf/scorecard/v4/probes/toolPyUpInstalled"
 	"github.com/ossf/scorecard/v4/probes/toolRenovateInstalled"
 	"github.com/ossf/scorecard/v4/probes/webhooksUseSecrets"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
 )
 
 // ProbeImpl is the implementation of a probe.
@@ -147,6 +155,16 @@ var (
 	SignedReleases = []ProbeImpl{
 		releasesAreSigned.Run,
 		releasesHaveProvenance.Run,
+	}
+	TokenPermissions = []ProbeImpl{		
+		hasNoGitHubWorkflowPermissionWriteActionsTop.Run,
+		hasNoGitHubWorkflowPermissionWriteAllTop.Run,
+		hasNoGitHubWorkflowPermissionWriteChecksTop.Run,
+		hasNoGitHubWorkflowPermissionWriteContentsTop.Run,
+		hasNoGitHubWorkflowPermissionWriteDeploymentsTop.Run,
+		hasNoGitHubWorkflowPermissionWritePackagesTop.Run,
+		hasNoGitHubWorkflowPermissionWriteSecurityEventsTop.Run,
+		hasNoGitHubWorkflowPermissionWriteStatusesTop.Run,
 	}
 
 	probeRunners = map[string]func(*checker.RawResults) ([]finding.Finding, string, error){

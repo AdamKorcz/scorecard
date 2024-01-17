@@ -15,7 +15,7 @@
 //nolint:stylecheck
 package gitHubWorkflowPermissionsStepsNoWrite
 
-import (
+/*import (
 	"embed"
 	"fmt"
 	"strings"
@@ -95,3 +95,4 @@ func newUint(u uint) *uint {
 func newStr(s string) *string {
 	return &s
 }
+*/

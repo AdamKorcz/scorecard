@@ -26,6 +26,7 @@ import (
 	sce "github.com/ossf/scorecard/v4/errors"
 	"github.com/ossf/scorecard/v4/finding"
 	"github.com/ossf/scorecard/v4/remediation"
+	"github.com/ossf/scorecard/v4/rule"
 )
 
 type permission string
@@ -59,13 +60,15 @@ func TokenPermissions(c *checker.CheckRequest) (checker.TokenPermissionsData, er
 		Pattern:       ".github/workflows/*",
 		CaseSensitive: false,
 	}, validateGitHubActionTokenPermissions, &data)
-
-    remediationMetadata, _ := remediation.New(c)
             
-    for i := range r.results.TokenPermissions {
-        rr := &r.results.TokenPermissions[i]
-        remdtion := remediation.New(c)
-        rr.Remediation = remdtion
+    for i := range data.results.TokenPermissions {
+        rr := &data.results.TokenPermissions[i]
+        remdtion, _ := remediation.New(c)
+        ruleRemdtion := &rule.Remediation {
+        	Branch: remdtion.Branch,
+			Repo: remdtion.Repo,
+        }
+        rr.Remediation = ruleRemdtion
     }
 
 	return data.results, err

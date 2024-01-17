@@ -15,7 +15,7 @@
 //nolint:stylecheck
 package gitHubWorkflowPermissionsTopNoWrite
 
-import (
+/*import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -154,4 +154,4 @@ func Test_Run(t *testing.T) {
 			test.AssertOutcomes(t, findings, tt.outcomes)
 		})
 	}
-}
+}*/

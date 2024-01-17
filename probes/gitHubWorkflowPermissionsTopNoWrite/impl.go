@@ -15,7 +15,7 @@
 //nolint:stylecheck
 package gitHubWorkflowPermissionsTopNoWrite
 
-import (
+/*import (
 	"embed"
 	"fmt"
 
@@ -94,4 +94,4 @@ func newUint(u uint) *uint {
 // avoid memory aliasing by returning a new copy.
 func newStr(s string) *string {
 	return &s
-}
+}*/

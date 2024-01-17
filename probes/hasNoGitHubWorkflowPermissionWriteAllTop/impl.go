@@ -21,8 +21,8 @@ import (
 
 	"github.com/ossf/scorecard/v4/checker"
 	"github.com/ossf/scorecard/v4/finding"
-	"github.com/ossf/scorecard/v4/probes/internal/utils/uerror"
 	"github.com/ossf/scorecard/v4/probes/internal/utils/permissions"
+	"github.com/ossf/scorecard/v4/probes/internal/utils/uerror"
 )
 
 //go:embed *.yml
@@ -42,7 +42,7 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 		if r.Type != checker.PermissionLevelWrite {
 			continue
 		}
-		if r.Name != "all" {
+		if *r.Name != "all" {
 			continue
 		}
 		if *r.LocationType != checker.PermissionLocationTop {
@@ -50,7 +50,7 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 		}
 
 		// Create finding
-		f, err := permissions.CreateNegativeFinding(r, Probe)
+		f, err := permissions.CreateNegativeFinding(r, Probe, fs)
 		if err != nil {
 			return nil, Probe, fmt.Errorf("create finding: %w", err)
 		}
@@ -59,10 +59,10 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 
 	if len(findings) == 0 {
 		f, err := finding.NewWith(fs, Probe,
-			"no workflows with write permissions for 'all' at top level"
-			, nil, finding.OutcomePositive)
+			"no workflows with write permissions for 'all' at top level",
+			nil, finding.OutcomePositive)
 		if err != nil {
-			return nil, fmt.Errorf("create finding: %w", err)
+			return nil, Probe, fmt.Errorf("create finding: %w", err)
 		}
 		findings = append(findings, *f)
 	}

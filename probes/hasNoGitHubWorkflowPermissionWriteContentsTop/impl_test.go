@@ -13,7 +13,8 @@
 // limitations under the License.
 
 //nolint:stylecheck
-package hasNoGitHubWorkflowPermissionsTopNoWriteTop
+package hasNoGitHubWorkflowPermissionWriteContentsTop
+
 /*
 import (
 	"testing"
