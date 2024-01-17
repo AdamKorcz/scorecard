@@ -21,6 +21,7 @@ import (
 	"github.com/ossf/scorecard/v4/clients"
 	"github.com/ossf/scorecard/v4/finding"
 	"github.com/ossf/scorecard/v4/rule"
+	"github.com/ossf/scorecard/v4/remediation"
 )
 
 // RawResults contains results before a policy
@@ -126,7 +127,7 @@ type Dependency struct {
 	Location    *File
 	Msg         *string // Only for debug messages.
 	Pinned      *bool
-	Remediation *rule.Remediation
+	Remediation *remediation.Remediation
 	Type        DependencyUseType
 }
 
@@ -425,6 +426,7 @@ type TokenPermission struct {
 	File         *File
 	Msg          *string
 	Type         PermissionLevel
+	Remediation  *rule.Remediation
 }
 
 // Location generates location from a file.
