@@ -32,6 +32,8 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUndeclared"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllRun"
 	//"github.com/ossf/scorecard/v4/remediation"
 )
 
@@ -109,6 +111,8 @@ func TokenPermissions(name string,
 		hasGithubWorkflowPermissionUnknown.Probe,
 		hasGithubWorkflowPermissionNone.Probe,
 		hasGithubWorkflowPermissionRead.Probe,
+		hasGithubWorkflowPermissionUndeclared.Probe,
+		hasNoGitHubWorkflowPermissionWriteAllRun.Probe,
 	}
 	if !finding.UniqueProbesEqual(findings, expectedProbes) {
 		e := sce.WithMessage(sce.ErrScorecardInternal, "invalid probe results")
@@ -117,14 +121,37 @@ func TokenPermissions(name string,
 
 	// Start with a perfect score.
 	score := float32(checker.MaxResultScore)
+
+	foundWritePermissions := false
 	
 	for i := range findings {
 		f := &findings[i]
+
+		if f.Probe == hasGithubWorkflowPermissionUndeclared.Probe {
+			switch f.Outcome {
+			case finding.OutcomeNegative:
+				dl.Warn(&checker.LogMessage{
+					Finding: f,
+				})
+			case finding.OutcomeNotAvailable:				
+				return checker.CreateResultWithScore(name,
+					"detected GitHub workflow tokens with excessive permissions", checker.InconclusiveResultScore)
+			case finding.OutcomeNotApplicable:
+				// We warn only for top-level.
+				dl.Debug(&checker.LogMessage{
+					Finding: f,
+				})
+			}
+		}
+
+
+
 		if f.Outcome != finding.OutcomeNegative {
 			continue
 		}
 		switch f.Probe {
 		case hasGithubWorkflowPermissionNone.Probe, hasGithubWorkflowPermissionRead.Probe:
+			fmt.Println("Log 1")
 			dl.Info(&checker.LogMessage{
 				Finding: f,
 			})			
@@ -133,8 +160,16 @@ func TokenPermissions(name string,
 				Finding: f,
 			})			
 		case hasNoGitHubWorkflowPermissionWriteActionsTop.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			foundWritePermissions = true
 			score -= checker.MaxResultScore
 		case hasNoGitHubWorkflowPermissionWriteAllTop.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			foundWritePermissions = true
 			// If no top level permissions are defined, all the permissions
 			// are enabled by default. In this case,
 			/*if permissionIsPresentInRunLevel(perms, "all") {
@@ -144,20 +179,54 @@ func TokenPermissions(name string,
 			// ... reduce score if run level permissions are defined.
 			score -= 0.5
 		case hasNoGitHubWorkflowPermissionWriteChecksTop.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			foundWritePermissions = true
 			score -= 0.5
 		case hasNoGitHubWorkflowPermissionWriteContentsTop.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			foundWritePermissions = true
+			score -= checker.MaxResultScore
 		case hasNoGitHubWorkflowPermissionWriteDeploymentsTop.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			foundWritePermissions = true
 			score--
 		case hasNoGitHubWorkflowPermissionWritePackagesTop.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			foundWritePermissions = true
 			score -= checker.MaxResultScore
 		case hasNoGitHubWorkflowPermissionWriteSecurityEventsTop.Probe:
+			panic("Here")
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			foundWritePermissions = true
 			score--
 		case hasNoGitHubWorkflowPermissionWriteStatusesTop.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			foundWritePermissions = true
 			score -= 0.5
 		}
 	}
 	if score < checker.MinResultScore {
 		score = checker.MinResultScore
+	}
+	if !foundWritePermissions {
+		fmt.Println("Log 2")
+
+		//text := fmt.Sprintf("no %s write permissions found", checker.PermissionLocationJob)
+		dl.Info(&checker.LogMessage{
+			Text: "text",
+		})
 	}
 	fmt.Println("here: ", score)
 	if score != checker.MaxResultScore {
