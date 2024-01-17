@@ -39,10 +39,10 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	var findings []finding.Finding
 
 	for _, r := range results.TokenPermissions {
-		if r.Type != checker.PermissionLevelWrite {
+		if r.Name != nil && *r.Name != "security-events" {
 			continue
 		}
-		if *r.Name != "security-events" {
+		if r.Type != checker.PermissionLevelWrite {
 			continue
 		}
 		if *r.LocationType != checker.PermissionLocationTop {

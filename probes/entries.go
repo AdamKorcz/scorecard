@@ -70,6 +70,9 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
 )
 
 // ProbeImpl is the implementation of a probe.
@@ -165,6 +168,9 @@ var (
 		hasNoGitHubWorkflowPermissionWritePackagesTop.Run,
 		hasNoGitHubWorkflowPermissionWriteSecurityEventsTop.Run,
 		hasNoGitHubWorkflowPermissionWriteStatusesTop.Run,
+		hasGithubWorkflowPermissionUnknown.Run,
+		hasGithubWorkflowPermissionNone.Run,
+		hasGithubWorkflowPermissionRead.Run,
 	}
 
 	probeRunners = map[string]func(*checker.RawResults) ([]finding.Finding, string, error){
