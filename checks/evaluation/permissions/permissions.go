@@ -138,6 +138,7 @@ func TokenPermissions(name string,
 	hasWriteAllAtTopLevel := false
 	hasWriteAllAtJobLevel := false
 	hasUndeclaredJobLevelPermissions := false
+	hasUndeclaredTopLevelPermissions := false
 
 	for i := range findings {
 		f := &findings[i]
@@ -155,6 +156,12 @@ func TokenPermissions(name string,
 			}
 		}
 
+		// If there are no TokenPermissions
+		if f.Outcome == finding.OutcomeNotAvailable {
+			return checker.CreateResultWithScore(name,
+					"No tokens found", checker.InconclusiveResultScore)
+		}
+
 		if f.Outcome != finding.OutcomeNegative {
 			continue
 		}
@@ -166,14 +173,17 @@ func TokenPermissions(name string,
 					Finding: f,
 				})
 				hasUndeclaredJobLevelPermissions = true
-				if hasWriteAllAtTopLevel {
+				if hasWriteAllAtTopLevel || hasUndeclaredTopLevelPermissions {
 					score = checker.MinResultScore
-					break
 				}
 			} else if f.Values["topLevel"] == 1 {
 				dl.Warn(&checker.LogMessage{
 					Finding: f,
 				})
+				hasUndeclaredTopLevelPermissions = true
+				if hasUndeclaredJobLevelPermissions {
+					score = checker.MinResultScore
+				}
 			}
 		case hasGithubWorkflowPermissionNone.Probe, hasGithubWorkflowPermissionRead.Probe:
 			dl.Info(&checker.LogMessage{
@@ -189,7 +199,6 @@ func TokenPermissions(name string,
 			})
 			score -= checker.MaxResultScore
 		case hasNoGitHubWorkflowPermissionWriteAllTop.Probe:
-
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})

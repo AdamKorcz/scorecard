@@ -38,6 +38,17 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	results := raw.TokenPermissionsResults
 	var findings []finding.Finding
 
+	if results.NumTokens == 0 {
+		f, err := finding.NewWith(fs, Probe,
+			"No token permissions found",
+			nil, finding.OutcomeNotAvailable)
+		if err != nil {
+			return nil, Probe, fmt.Errorf("create finding: %w", err)
+		}
+		findings = append(findings, *f)
+		return findings, Probe, nil
+	}
+
 	for _, r := range results.TokenPermissions {
 		if r.LocationType != nil && *r.LocationType != checker.PermissionLocationJob {
 			continue
