@@ -21,19 +21,25 @@ import (
 	"github.com/ossf/scorecard/v4/checker"
 	sce "github.com/ossf/scorecard/v4/errors"
 	"github.com/ossf/scorecard/v4/finding"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUndeclared"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsTop"
 	//"github.com/ossf/scorecard/v4/remediation"
 )
 
@@ -113,6 +119,12 @@ func TokenPermissions(name string,
 		hasGithubWorkflowPermissionRead.Probe,
 		hasGithubWorkflowPermissionUndeclared.Probe,
 		hasNoGitHubWorkflowPermissionWriteAllRun.Probe,
+		hasNoGitHubWorkflowPermissionWriteSecurityEventsRun.Probe,
+		hasNoGitHubWorkflowPermissionWriteActionsRun.Probe,
+		hasNoGitHubWorkflowPermissionWriteContentsRun.Probe,
+		hasNoGitHubWorkflowPermissionWritePackagesRun.Probe,
+		hasNoGithubWorkflowsWithUndeclaredPermissionsJob.Probe,
+		hasNoGithubWorkflowsWithUndeclaredPermissionsTop.Probe,
 	}
 	if !finding.UniqueProbesEqual(findings, expectedProbes) {
 		e := sce.WithMessage(sce.ErrScorecardInternal, "invalid probe results")
@@ -122,18 +134,17 @@ func TokenPermissions(name string,
 	// Start with a perfect score.
 	score := float32(checker.MaxResultScore)
 
-	foundWritePermissions := false
-	
+	//foundWritePermissions := false
+	hasWriteAllAtTopLevel := false
+	hasWriteAllAtJobLevel := false
+	hasUndeclaredJobLevelPermissions := false
+
 	for i := range findings {
 		f := &findings[i]
 
 		if f.Probe == hasGithubWorkflowPermissionUndeclared.Probe {
 			switch f.Outcome {
-			case finding.OutcomeNegative:
-				dl.Warn(&checker.LogMessage{
-					Finding: f,
-				})
-			case finding.OutcomeNotAvailable:				
+			case finding.OutcomeNotAvailable:
 				return checker.CreateResultWithScore(name,
 					"detected GitHub workflow tokens with excessive permissions", checker.InconclusiveResultScore)
 			case finding.OutcomeNotApplicable:
@@ -144,32 +155,49 @@ func TokenPermissions(name string,
 			}
 		}
 
-
-
 		if f.Outcome != finding.OutcomeNegative {
 			continue
 		}
+		//fmt.Println("negative probe", f.Probe)
 		switch f.Probe {
+		case hasGithubWorkflowPermissionUndeclared.Probe:
+			if f.Values["jobLevel"] == 1 {
+				dl.Debug(&checker.LogMessage{
+					Finding: f,
+				})
+				hasUndeclaredJobLevelPermissions = true
+				if hasWriteAllAtTopLevel {
+					score = checker.MinResultScore
+					break
+				}
+			} else if f.Values["topLevel"] == 1 {
+				dl.Warn(&checker.LogMessage{
+					Finding: f,
+				})
+			}
 		case hasGithubWorkflowPermissionNone.Probe, hasGithubWorkflowPermissionRead.Probe:
-			fmt.Println("Log 1")
 			dl.Info(&checker.LogMessage{
 				Finding: f,
-			})			
+			})
 		case hasGithubWorkflowPermissionUnknown.Probe:
 			dl.Debug(&checker.LogMessage{
 				Finding: f,
-			})			
+			})
 		case hasNoGitHubWorkflowPermissionWriteActionsTop.Probe:
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})
-			foundWritePermissions = true
 			score -= checker.MaxResultScore
 		case hasNoGitHubWorkflowPermissionWriteAllTop.Probe:
+
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})
-			foundWritePermissions = true
+			hasWriteAllAtTopLevel = true
+			if hasWriteAllAtJobLevel || hasUndeclaredJobLevelPermissions {
+				return checker.CreateResultWithScore(name,
+					"detected GitHub workflow tokens with excessive permissions", checker.MinResultScore)
+			}
 			// If no top level permissions are defined, all the permissions
 			// are enabled by default. In this case,
 			/*if permissionIsPresentInRunLevel(perms, "all") {
@@ -182,70 +210,79 @@ func TokenPermissions(name string,
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})
-			foundWritePermissions = true
 			score -= 0.5
 		case hasNoGitHubWorkflowPermissionWriteContentsTop.Probe:
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})
-			foundWritePermissions = true
 			score -= checker.MaxResultScore
 		case hasNoGitHubWorkflowPermissionWriteDeploymentsTop.Probe:
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})
-			foundWritePermissions = true
 			score--
 		case hasNoGitHubWorkflowPermissionWritePackagesTop.Probe:
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})
-			foundWritePermissions = true
 			score -= checker.MaxResultScore
 		case hasNoGitHubWorkflowPermissionWriteSecurityEventsTop.Probe:
-			panic("Here")
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})
-			foundWritePermissions = true
 			score--
 		case hasNoGitHubWorkflowPermissionWriteStatusesTop.Probe:
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})
-			foundWritePermissions = true
 			score -= 0.5
+		case hasNoGitHubWorkflowPermissionWriteAllRun.Probe:
+			hasWriteAllAtJobLevel = true
+			if hasWriteAllAtTopLevel {
+				score = checker.MinResultScore
+				break
+				/*return checker.CreateResultWithScore(name,
+					"detected GitHub workflow tokens with excessive permissions", checker.MinResultScore)*/
+			}
+			// write permission at job/step level
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+		case hasNoGitHubWorkflowPermissionWriteSecurityEventsRun.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			hasWriteAllAtJobLevel = true
+		case hasNoGitHubWorkflowPermissionWriteActionsRun.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			hasWriteAllAtJobLevel = true
+		case hasNoGitHubWorkflowPermissionWriteContentsRun.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			hasWriteAllAtJobLevel = true
+		case hasNoGitHubWorkflowPermissionWritePackagesRun.Probe:
+			dl.Warn(&checker.LogMessage{
+				Finding: f,
+			})
+			hasWriteAllAtJobLevel = true
 		}
 	}
 	if score < checker.MinResultScore {
 		score = checker.MinResultScore
 	}
-	if !foundWritePermissions {
-		fmt.Println("Log 2")
-
+	if !hasWriteAllAtJobLevel {
 		//text := fmt.Sprintf("no %s write permissions found", checker.PermissionLocationJob)
 		dl.Info(&checker.LogMessage{
 			Text: "text",
 		})
 	}
-	fmt.Println("here: ", score)
 	if score != checker.MaxResultScore {
-			return checker.CreateResultWithScore(name,
-				"detected GitHub workflow tokens with excessive permissions", int(score))
+		return checker.CreateResultWithScore(name,
+			"detected GitHub workflow tokens with excessive permissions", int(score))
 	}
-
-
-	/*
-		We need to keep this:
-		score, err := applyScorePolicy(findings, dl)
-		if err != nil {
-			return checker.CreateRuntimeErrorResult(name, err)
-		}
-
-		if score != checker.MaxResultScore {
-			return checker.CreateResultWithScore(name,
-				"detected GitHub workflow tokens with excessive permissions", score)
-		}*/
 
 	return checker.CreateMaxScoreResult(name,
 		"GitHub workflow tokens follow principle of least privilege")

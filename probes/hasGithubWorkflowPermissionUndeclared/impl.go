@@ -42,6 +42,14 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 		if r.Type != checker.PermissionLevelUndeclared {
 			continue
 		}
+		topLevel := 0
+		jobLevel := 0
+		if *r.LocationType == checker.PermissionLocationTop {
+			topLevel = 1
+		}
+		if *r.LocationType == checker.PermissionLocationJob {
+			jobLevel = 1
+		}
 		if r.LocationType == nil {
 			f, err := finding.NewWith(fs, Probe,
 				"no workflows with write permissions for 'all' at top level",
@@ -50,12 +58,17 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 				return nil, Probe, fmt.Errorf("create finding: %w", err)
 			}
 			findings = append(findings, *f)
-		} else if *r.LocationType == checker.PermissionLocationTop {
-		// Create finding
+		} else if *r.LocationType == checker.PermissionLocationTop ||  
+				  *r.LocationType == checker.PermissionLocationJob {
+			// Create finding
 			f, err := permissions.CreateNegativeFinding(r, Probe, fs)
 			if err != nil {
 				return nil, Probe, fmt.Errorf("create finding: %w", err)
 			}
+			f = f.WithValues(map[string]int {
+				"topLevel": topLevel,
+				"jobLevel": jobLevel,
+			})
 			findings = append(findings, *f)
 		} else {
 			f, err := finding.NewWith(fs, Probe,

@@ -75,6 +75,12 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUndeclared"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsTop"
 )
 
 // ProbeImpl is the implementation of a probe.
@@ -175,6 +181,12 @@ var (
 		hasGithubWorkflowPermissionRead.Run,
 		hasGithubWorkflowPermissionUndeclared.Run,
 		hasNoGitHubWorkflowPermissionWriteAllRun.Run,
+		hasNoGitHubWorkflowPermissionWriteSecurityEventsRun.Run,
+		hasNoGitHubWorkflowPermissionWriteContentsRun.Run,
+		hasNoGitHubWorkflowPermissionWritePackagesRun.Run,
+		hasNoGitHubWorkflowPermissionWriteActionsRun.Run,
+		hasNoGithubWorkflowsWithUndeclaredPermissionsJob.Run,
+		hasNoGithubWorkflowsWithUndeclaredPermissionsTop.Run,
 	}
 
 	probeRunners = map[string]func(*checker.RawResults) ([]finding.Finding, string, error){
