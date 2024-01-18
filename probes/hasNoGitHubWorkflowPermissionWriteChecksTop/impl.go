@@ -39,6 +39,9 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	var findings []finding.Finding
 
 	for _, r := range results.TokenPermissions {
+		if r.Name == nil {
+			continue
+		}
 		if r.Name != nil && *r.Name != "checks" {
 			continue
 		}

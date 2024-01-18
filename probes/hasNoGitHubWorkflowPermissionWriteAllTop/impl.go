@@ -39,8 +39,16 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	var findings []finding.Finding
 
 	for _, r := range results.TokenPermissions {
+		fmt.Println(r.Name)
+		if r.Name == nil {
+			if r.Value == nil {
+				continue
+			}
+		}
 		if r.Name != nil && *r.Name != "all" {
-			continue
+			if r.Value != nil && *r.Value != "write-all" {
+				continue
+			}
 		}
 		if r.Type != checker.PermissionLevelWrite {
 			continue

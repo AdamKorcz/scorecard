@@ -36,7 +36,7 @@ func TestGithubTokenPermissions(t *testing.T) {
 		filenames []string
 		expected  scut.TestReturn
 	}{
-		/*{
+		{
 			name:      "run workflow codeql write test",
 			filenames: []string{"./testdata/.github/workflows/github-workflow-permissions-run-codeql-write.yaml"},
 			expected: scut.TestReturn{
@@ -46,7 +46,7 @@ func TestGithubTokenPermissions(t *testing.T) {
 				NumberOfInfo:  2,
 				NumberOfDebug: 5,
 			},
-		},*/
+		},
 		{
 			name:      "run workflow no codeql write test",
 			filenames: []string{"./testdata/.github/workflows/github-workflow-permissions-run-no-codeql-write.yaml"},
@@ -57,7 +57,7 @@ func TestGithubTokenPermissions(t *testing.T) {
 				NumberOfInfo:  1,
 				NumberOfDebug: 4,
 			},
-		},/*
+		},
 		{
 			name:      "run workflow write test",
 			filenames: []string{"./testdata/.github/workflows/github-workflow-permissions-run-writes-2.yaml"},
@@ -134,7 +134,7 @@ func TestGithubTokenPermissions(t *testing.T) {
 				NumberOfInfo:  1,
 				NumberOfDebug: 5,
 			},
-		},
+		},/*
 		{
 			name:      "writes test",
 			filenames: []string{"./testdata/.github/workflows/github-workflow-permissions-writes.yaml"},
