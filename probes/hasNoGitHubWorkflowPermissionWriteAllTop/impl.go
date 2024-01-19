@@ -50,7 +50,6 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	}
 
 	for _, r := range results.TokenPermissions {
-		fmt.Println(r.Name)
 		if r.Name == nil {
 			if r.Value == nil {
 				continue
