@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-id: hasNoGitHubWorkflowPermissionWriteContentsRun
+id: hasNoGitHubWorkflowPermissionWriteContentsJob
 short: Checks that GitHub workflows do not have default write permissions
 motivation: >
   If no permissions are declared, a workflow's GitHub token's permissions default to write for all scopes.

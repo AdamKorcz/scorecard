@@ -25,17 +25,17 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUndeclared"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsJob"
@@ -64,11 +64,11 @@ func TokenPermissions(name string,
 		hasGithubWorkflowPermissionNone.Probe,
 		hasGithubWorkflowPermissionRead.Probe,
 		hasGithubWorkflowPermissionUndeclared.Probe,
-		hasNoGitHubWorkflowPermissionWriteAllRun.Probe,
-		hasNoGitHubWorkflowPermissionWriteSecurityEventsRun.Probe,
-		hasNoGitHubWorkflowPermissionWriteActionsRun.Probe,
-		hasNoGitHubWorkflowPermissionWriteContentsRun.Probe,
-		hasNoGitHubWorkflowPermissionWritePackagesRun.Probe,
+		hasNoGitHubWorkflowPermissionWriteAllJob.Probe,
+		hasNoGitHubWorkflowPermissionWriteSecurityEventsJob.Probe,
+		hasNoGitHubWorkflowPermissionWriteActionsJob.Probe,
+		hasNoGitHubWorkflowPermissionWriteContentsJob.Probe,
+		hasNoGitHubWorkflowPermissionWritePackagesJob.Probe,
 		hasNoGithubWorkflowsWithUndeclaredPermissionsJob.Probe,
 		hasNoGithubWorkflowsWithUndeclaredPermissionsTop.Probe,
 		hasNoGitHubWorkflowPermissionWriteChecksJob.Probe,
@@ -191,7 +191,7 @@ func TokenPermissions(name string,
 				Finding: f,
 			})
 			score--
-		case hasNoGitHubWorkflowPermissionWriteAllRun.Probe:
+		case hasNoGitHubWorkflowPermissionWriteAllJob.Probe:
 			dl.Warn(&checker.LogMessage{
 				Finding: f,
 			})
@@ -205,10 +205,10 @@ func TokenPermissions(name string,
 			}
 		case hasNoGitHubWorkflowPermissionWriteStatusesJob.Probe,
 		 	 hasNoGitHubWorkflowPermissionWriteDeploymentsJob.Probe,
-		 	 hasNoGitHubWorkflowPermissionWriteSecurityEventsRun.Probe,
-		 	 hasNoGitHubWorkflowPermissionWriteActionsRun.Probe,
-		 	 hasNoGitHubWorkflowPermissionWriteContentsRun.Probe,
-		 	 hasNoGitHubWorkflowPermissionWritePackagesRun.Probe,
+		 	 hasNoGitHubWorkflowPermissionWriteSecurityEventsJob.Probe,
+		 	 hasNoGitHubWorkflowPermissionWriteActionsJob.Probe,
+		 	 hasNoGitHubWorkflowPermissionWriteContentsJob.Probe,
+		 	 hasNoGitHubWorkflowPermissionWritePackagesJob.Probe,
 		 	 hasNoGitHubWorkflowPermissionWriteChecksJob.Probe:
 			dl.Warn(&checker.LogMessage{
 				Finding: f,

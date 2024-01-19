@@ -79,11 +79,11 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUndeclared"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllRun"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsRun"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsRun"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesRun"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsRun"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsTop"
 )
@@ -185,11 +185,11 @@ var (
 		hasGithubWorkflowPermissionNone.Run,
 		hasGithubWorkflowPermissionRead.Run,
 		hasGithubWorkflowPermissionUndeclared.Run,
-		hasNoGitHubWorkflowPermissionWriteAllRun.Run,
-		hasNoGitHubWorkflowPermissionWriteSecurityEventsRun.Run,
-		hasNoGitHubWorkflowPermissionWriteContentsRun.Run,
-		hasNoGitHubWorkflowPermissionWritePackagesRun.Run,
-		hasNoGitHubWorkflowPermissionWriteActionsRun.Run,
+		hasNoGitHubWorkflowPermissionWriteAllJob.Run,
+		hasNoGitHubWorkflowPermissionWriteSecurityEventsJob.Run,
+		hasNoGitHubWorkflowPermissionWriteContentsJob.Run,
+		hasNoGitHubWorkflowPermissionWritePackagesJob.Run,
+		hasNoGitHubWorkflowPermissionWriteActionsJob.Run,
 		hasNoGithubWorkflowsWithUndeclaredPermissionsJob.Run,
 		hasNoGithubWorkflowsWithUndeclaredPermissionsTop.Run,
 		hasNoGitHubWorkflowPermissionWriteChecksJob.Run,
