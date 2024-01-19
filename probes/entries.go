@@ -70,6 +70,11 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksJob"
+
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsJob"
+
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesJob"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
 	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
@@ -187,6 +192,9 @@ var (
 		hasNoGitHubWorkflowPermissionWriteActionsRun.Run,
 		hasNoGithubWorkflowsWithUndeclaredPermissionsJob.Run,
 		hasNoGithubWorkflowsWithUndeclaredPermissionsTop.Run,
+		hasNoGitHubWorkflowPermissionWriteChecksJob.Run,
+		hasNoGitHubWorkflowPermissionWriteDeploymentsJob.Run,
+		hasNoGitHubWorkflowPermissionWriteStatusesJob.Run,
 	}
 
 	probeRunners = map[string]func(*checker.RawResults) ([]finding.Finding, string, error){
