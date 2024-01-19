@@ -116,7 +116,7 @@ var validateGitHubActionTokenPermissions fileparser.DoWhileTrueOnFileContent = f
 	// 2. Run-level permission definitions,
 	// see https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idpermissions.
 	ignoredPermissions := createIgnoredPermissions(workflow, path, pdata)
-	fmt.Println("len pdata after createIgnoredPermissions: ", len(pdata.results.TokenPermissions))
+	//fmt.Println("len pdata after createIgnoredPermissions: ", len(pdata.results.TokenPermissions))
 	if err := validatejobLevelPermissions(workflow, path, pdata, ignoredPermissions); err != nil {
 		return false, err
 	}
@@ -240,7 +240,7 @@ func validatePermissions(permissions *actionlint.Permissions, permLoc checker.Pe
 		val := permissions.All.Value
 		lineNumber := fileparser.GetLineNumber(permissions.All.Pos)
 		if !strings.EqualFold(val, "read-all") && val != "" {
-			fmt.Println("val: ", val)
+			//fmt.Println("val: ", val)
 			pdata.results.TokenPermissions = append(pdata.results.TokenPermissions,
 				checker.TokenPermission{
 					File: &checker.File{
