@@ -111,7 +111,6 @@ func TokenPermissions(name string,
 		if f.Outcome != finding.OutcomeNegative {
 			continue
 		}
-		fmt.Println(f)
 		if _, ok := undeclaredPermissions["jobLevel"][f.Location.Path]; !ok {
 			undeclaredPermissions["jobLevel"][f.Location.Path] = false
 		}
@@ -216,13 +215,17 @@ func TokenPermissions(name string,
 	if score < checker.MinResultScore {
 		score = checker.MinResultScore
 	}
+	foundWritePermissions := false
 	for _, v1 := range hasWritePermissions["jobLevel"] {
-		if v1 == false {
-			text := fmt.Sprintf("no %s write permissions found", checker.PermissionLocationJob)
-			dl.Info(&checker.LogMessage{
-				Text: text,
-			})
+		if v1 == true {
+			foundWritePermissions = true
 		}
+	}
+	if foundWritePermissions == false {
+		text := fmt.Sprintf("no %s write permissions found", checker.PermissionLocationJob)
+		dl.Info(&checker.LogMessage{
+			Text: text,
+		})
 	}
 	if score != checker.MaxResultScore {
 		return checker.CreateResultWithScore(name,
