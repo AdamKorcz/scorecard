@@ -8,6 +8,8 @@ import (
 	"github.com/ossf/scorecard/v4/checker"
 	sce "github.com/ossf/scorecard/v4/errors"
 	"github.com/ossf/scorecard/v4/finding"
+
+	"github.com/ossf/scorecard/v4/probes/internal/utils/uerror"
 )
 
 func CreateText(t checker.TokenPermission) (string, error) {
@@ -70,6 +72,64 @@ func CreateNegativeFinding(r checker.TokenPermission, Probe string, fs embed.FS)
 			})
 		}
 		return f, nil
+}
+
+func CreateFindings(fs embed.FS,
+					raw *checker.RawResults,
+					locationType checker.PermissionLocation,
+					permissionLevel checker.PermissionLevel,
+					probe, tokenName, negativeOutcomeMsg,
+					positiveOutcomeMsg string) ([]finding.Finding, string, error) {
+	if raw == nil {
+		return nil, "", fmt.Errorf("%w: raw", uerror.ErrNil)
+	}
+
+	results := raw.TokenPermissionsResults
+	var findings []finding.Finding
+
+	if results.NumTokens == 0 {
+		f, err := finding.NewWith(fs, probe,
+			"No token permissions found",
+			nil, finding.OutcomeNotAvailable)
+		if err != nil {
+			return nil, probe, fmt.Errorf("create finding: %w", err)
+		}
+		findings = append(findings, *f)
+		return findings, probe, nil
+	}
+
+	for _, r := range results.TokenPermissions {
+		if r.Name == nil {
+			continue
+		}
+		if *r.Name != tokenName {
+			continue
+		}
+		if r.Type != permissionLevel {
+			continue
+		}
+		if *r.LocationType != locationType {
+			continue
+		}
+
+		// Create finding
+		f, err := CreateNegativeFinding(r, probe, fs)
+		if err != nil {
+			return nil, probe, fmt.Errorf("create finding: %w", err)
+		}
+		findings = append(findings, *f)
+	}
+
+	if len(findings) == 0 {
+		f, err := finding.NewWith(fs, probe,
+			"no workflows with write permissions for 'all' at top level",
+			nil, finding.OutcomePositive)
+		if err != nil {
+			return nil, probe, fmt.Errorf("create finding: %w", err)
+		}
+		findings = append(findings, *f)
+	}
+	return findings, probe, nil
 }
 
 // avoid memory aliasing by returning a new copy.
