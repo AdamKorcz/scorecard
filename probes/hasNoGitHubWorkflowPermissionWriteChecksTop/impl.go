@@ -17,12 +17,12 @@ package hasNoGitHubWorkflowPermissionWriteChecksTop
 
 import (
 	"embed"
-	"fmt"
+	//"fmt"
 
 	"github.com/ossf/scorecard/v4/checker"
 	"github.com/ossf/scorecard/v4/finding"
 	"github.com/ossf/scorecard/v4/probes/internal/utils/permissions"
-	"github.com/ossf/scorecard/v4/probes/internal/utils/uerror"
+	//"github.com/ossf/scorecard/v4/probes/internal/utils/uerror"
 )
 
 //go:embed *.yml
@@ -31,54 +31,7 @@ var fs embed.FS
 const Probe = "hasNoGitHubWorkflowPermissionWriteChecksTop"
 
 func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
-	if raw == nil {
-		return nil, "", fmt.Errorf("%w: raw", uerror.ErrNil)
-	}
-
-	results := raw.TokenPermissionsResults
-	var findings []finding.Finding
-
-	if results.NumTokens == 0 {
-		f, err := finding.NewWith(fs, Probe,
-			"No token permissions found",
-			nil, finding.OutcomeNotAvailable)
-		if err != nil {
-			return nil, Probe, fmt.Errorf("create finding: %w", err)
-		}
-		findings = append(findings, *f)
-		return findings, Probe, nil
-	}
-
-	for _, r := range results.TokenPermissions {
-		if r.Name == nil {
-			continue
-		}
-		if r.Name != nil && *r.Name != "checks" {
-			continue
-		}
-		if r.Type != checker.PermissionLevelWrite {
-			continue
-		}
-		if *r.LocationType != checker.PermissionLocationTop {
-			continue
-		}
-
-		// Create finding
-		f, err := permissions.CreateNegativeFinding(r, Probe, fs)
-		if err != nil {
-			return nil, Probe, fmt.Errorf("create finding: %w", err)
-		}
-		findings = append(findings, *f)
-	}
-
-	if len(findings) == 0 {
-		f, err := finding.NewWith(fs, Probe,
-			"no workflows with write permissions for 'all' at top level",
-			nil, finding.OutcomePositive)
-		if err != nil {
-			return nil, Probe, fmt.Errorf("create finding: %w", err)
-		}
-		findings = append(findings, *f)
-	}
-	return findings, Probe, nil
+	return permissions.CreateFindings(fs, raw, checker.PermissionLocationTop,
+									  checker.PermissionLevelWrite, Probe,
+									  "checks", "", "")
 }
