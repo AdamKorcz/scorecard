@@ -15,135 +15,201 @@
 //nolint:stylecheck
 package hasNoGithubWorkflowsWithUndeclaredPermissionsJob
 
-/*import (
+import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/ossf/scorecard/v4/checker"
-	"github.com/ossf/scorecard/v4/finding"
 	"github.com/ossf/scorecard/v4/probes/internal/utils/test"
+	"github.com/ossf/scorecard/v4/probes/internal/utils/permissions"
+	"github.com/ossf/scorecard/v4/finding"
 )
 
 func Test_Run(t *testing.T) {
 	t.Parallel()
+	locationType := checker.PermissionLocationJob
+	wrongName := "wrongName"
 	name := "name"
-	all := "all"
+	permissionType := checker.PermissionLevelUndeclared	
+	var wrongPermissionLocation checker.PermissionLocation
+	if locationType == checker.PermissionLocationTop {
+		wrongPermissionLocation = checker.PermissionLocationJob
+	} else {
+		wrongPermissionLocation = checker.PermissionLocationTop
+	}
 	value := "value"
-	//msg := "msg"
-	permLoc := checker.PermissionLocationTop
-	//nolint:govet
-	tests := []struct {
-		name     string
-		raw      *checker.RawResults
-		outcomes []finding.Outcome
-		err      error
-	}{
+
+	tests := []permissions.TestData {
 		{
-			name: "Read permission.",
-			raw: &checker.RawResults{
+			Name: "No Tokens",
+			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
-					TokenPermissions: []checker.TokenPermission {
-						{
-							LocationType: &permLoc,
-							Name:         &name,
-							Value:        &value,
-							Msg:          nil,
-							Type:         checker.PermissionLevelRead,
-						},
-					},
+					NumTokens: 0,
 				},
 			},
-			outcomes: []finding.Outcome{
-				finding.OutcomePositive,
+			Outcomes: []finding.Outcome{
+				finding.OutcomeNotAvailable,
 			},
 		},
 		{
-			name: "Write permission",
-			raw: &checker.RawResults{
+			Name: "Invalid name - shouldn't affect the score",
+			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
+					NumTokens: 1,
 					TokenPermissions: []checker.TokenPermission {
 						{
-							LocationType: &permLoc,
-							Name:         &name,
+							LocationType: &locationType,
+							Name:         &wrongName,
 							Value:        &value,
 							Msg:          nil,
-							Type:         checker.PermissionLevelWrite,
+							Type:         permissionType,
 						},
 					},
 				},
 			},
-			outcomes: []finding.Outcome{
+			Outcomes: []finding.Outcome{
 				finding.OutcomeNegative,
 			},
 		},
 		{
-			name: "None permission",
-			raw: &checker.RawResults{
+			Name: "Correct name",
+			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
+					NumTokens: 1,
 					TokenPermissions: []checker.TokenPermission {
 						{
-							LocationType: &permLoc,
+							LocationType: &locationType,
 							Name:         &name,
 							Value:        &value,
 							Msg:          nil,
-							Type:         checker.PermissionLevelNone,
+							Type:         permissionType,
 						},
 					},
 				},
 			},
-			outcomes: []finding.Outcome{
+			Outcomes: []finding.Outcome{
+				finding.OutcomeNegative,
+			},
+		},
+		{
+			Name: "Two tokens",
+			Raw: &checker.RawResults{
+				TokenPermissionsResults: checker.TokenPermissionsData{
+					NumTokens: 2,
+					TokenPermissions: []checker.TokenPermission {
+						{
+							LocationType: &locationType,
+							Name:         &name,
+							Value:        &value,
+							Msg:          nil,
+							Type:         permissionType,
+						},
+						{
+							LocationType: &locationType,
+							Name:         &name,
+							Value:        &value,
+							Msg:          nil,
+							Type:         permissionType,
+						},
+					},
+				},
+			},
+			Outcomes: []finding.Outcome{
+				finding.OutcomeNegative, finding.OutcomeNegative,
+			},
+		},
+		{
+			Name: "Value is nil - Everything else correct",
+			Raw: &checker.RawResults{
+				TokenPermissionsResults: checker.TokenPermissionsData{
+					NumTokens: 1,
+					TokenPermissions: []checker.TokenPermission {
+						{
+							LocationType: &locationType,
+							Name:         &name,
+							Value:        nil,
+							Msg:          nil,
+							Type:         permissionType,
+						},
+					},
+				},
+			},
+			Outcomes: []finding.Outcome{
+				finding.OutcomeNegative,
+			},
+		},
+		{
+			Name: "Value is nil - Type is wrong",
+			Raw: &checker.RawResults{
+				TokenPermissionsResults: checker.TokenPermissionsData{
+					NumTokens: 1,
+					TokenPermissions: []checker.TokenPermission {
+						{
+							LocationType: &locationType,
+							Name:         &name,
+							Value:        nil,
+							Msg:          nil,
+							Type:         checker.PermissionLevel("999"),
+						},
+					},
+				},
+			},
+			Outcomes: []finding.Outcome{
 				finding.OutcomePositive,
 			},
 		},
 		{
-			name: "Unknown permission",
-			raw: &checker.RawResults{
+			Name: "Wrong locationType wrong type",
+			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
+					NumTokens: 1,
 					TokenPermissions: []checker.TokenPermission {
 						{
-							LocationType: &permLoc,
+							LocationType: &wrongPermissionLocation,
 							Name:         &name,
-							Value:        &value,
+							Value:        nil,
 							Msg:          nil,
-							Type:         checker.PermissionLevelUnknown,
+							Type:         checker.PermissionLevel("999"),
 						},
 					},
 				},
 			},
-			outcomes: []finding.Outcome{
-				finding.OutcomeError,
+			Outcomes: []finding.Outcome{
+				finding.OutcomePositive,
 			},
 		},
 		{
-			name: "Undeclared permission",
-			raw: &checker.RawResults{
+			Name: "Wrong locationType correct type",
+			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
+					NumTokens: 1,
 					TokenPermissions: []checker.TokenPermission {
 						{
-							LocationType: &permLoc,
-							Name:         &all,
-							Value:        &value,
+							LocationType: &wrongPermissionLocation,
+							Name:         &name,
+							Value:        nil,
 							Msg:          nil,
-							Type:         checker.PermissionLevelUndeclared,
+							Type:         permissionType,
 						},
 					},
 				},
 			},
-			outcomes: []finding.Outcome{
-				finding.OutcomeNegative,
+			Outcomes: []finding.Outcome{
+				finding.OutcomePositive,
 			},
 		},
 	}
+	
 	for _, tt := range tests {
 		tt := tt // Re-initializing variable so it is not changed while executing the closure below
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.Name, func(t *testing.T) {
 			t.Parallel()
 
-			findings, s, err := Run(tt.raw)
-			if !cmp.Equal(tt.err, err, cmpopts.EquateErrors()) {
-				t.Errorf("mismatch (-want +got):\n%s", cmp.Diff(tt.err, err, cmpopts.EquateErrors()))
+			findings, s, err := Run(tt.Raw)
+			if !cmp.Equal(tt.Err, err, cmpopts.EquateErrors()) {
+				t.Errorf("mismatch (-want +got):\n%s", cmp.Diff(tt.Err, err, cmpopts.EquateErrors()))
 			}
 			if err != nil {
 				return
@@ -151,7 +217,7 @@ func Test_Run(t *testing.T) {
 			if diff := cmp.Diff(Probe, s); diff != "" {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}
-			test.AssertOutcomes(t, findings, tt.outcomes)
+			test.AssertOutcomes(t, findings, tt.Outcomes)
 		})
 	}
-}*/
+}
