@@ -122,7 +122,7 @@ func CreateFindings(fs embed.FS,
 
 	if len(findings) == 0 {
 		f, err := finding.NewWith(fs, probe,
-			"no workflows with write permissions for 'all' at top level",
+			fmt.Sprintf("no workflows with write permissions for '%v' at '%v'", tokenName, permissionLevel),
 			nil, finding.OutcomePositive)
 		if err != nil {
 			return nil, probe, fmt.Errorf("create finding: %w", err)
