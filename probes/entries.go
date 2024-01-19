@@ -84,8 +84,6 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsJob"
-	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsJob"
-	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsTop"
 )
 
 // ProbeImpl is the implementation of a probe.
@@ -190,8 +188,6 @@ var (
 		hasNoGitHubWorkflowPermissionWriteContentsJob.Run,
 		hasNoGitHubWorkflowPermissionWritePackagesJob.Run,
 		hasNoGitHubWorkflowPermissionWriteActionsJob.Run,
-		hasNoGithubWorkflowsWithUndeclaredPermissionsJob.Run,
-		hasNoGithubWorkflowsWithUndeclaredPermissionsTop.Run,
 		hasNoGitHubWorkflowPermissionWriteChecksJob.Run,
 		hasNoGitHubWorkflowPermissionWriteDeploymentsJob.Run,
 		hasNoGitHubWorkflowPermissionWriteStatusesJob.Run,

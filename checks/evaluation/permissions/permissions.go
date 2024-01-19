@@ -38,8 +38,6 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsJob"
-	"github.com/ossf/scorecard/v4/probes/hasNoGithubWorkflowsWithUndeclaredPermissionsTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesJob"
@@ -69,8 +67,6 @@ func TokenPermissions(name string,
 		hasNoGitHubWorkflowPermissionWriteActionsJob.Probe,
 		hasNoGitHubWorkflowPermissionWriteContentsJob.Probe,
 		hasNoGitHubWorkflowPermissionWritePackagesJob.Probe,
-		hasNoGithubWorkflowsWithUndeclaredPermissionsJob.Probe,
-		hasNoGithubWorkflowsWithUndeclaredPermissionsTop.Probe,
 		hasNoGitHubWorkflowPermissionWriteChecksJob.Probe,
 		hasNoGitHubWorkflowPermissionWriteDeploymentsJob.Probe,
 		hasNoGitHubWorkflowPermissionWriteStatusesJob.Probe,
@@ -115,6 +111,7 @@ func TokenPermissions(name string,
 		if f.Outcome != finding.OutcomeNegative {
 			continue
 		}
+		fmt.Println(f)
 		if _, ok := undeclaredPermissions["jobLevel"][f.Location.Path]; !ok {
 			undeclaredPermissions["jobLevel"][f.Location.Path] = false
 		}

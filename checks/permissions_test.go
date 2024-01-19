@@ -36,7 +36,7 @@ func TestGithubTokenPermissions(t *testing.T) {
 		filenames []string
 		expected  scut.TestReturn
 	}{
-		/*{
+		{
 			name:      "run workflow codeql write test",
 			filenames: []string{"./testdata/.github/workflows/github-workflow-permissions-run-codeql-write.yaml"},
 			expected: scut.TestReturn{
@@ -178,7 +178,7 @@ func TestGithubTokenPermissions(t *testing.T) {
 				NumberOfInfo:  2,
 				NumberOfDebug: 5,
 			},
-		},*/
+		},
 		{
 			name:      "status/checks write",
 			filenames: []string{"./testdata/.github/workflows/github-workflow-permissions-status-checks.yaml"},
@@ -189,7 +189,7 @@ func TestGithubTokenPermissions(t *testing.T) {
 				NumberOfInfo:  3,
 				NumberOfDebug: 6,
 			},
-		},/*
+		},
 		{
 			name:      "sec-events/deployments write",
 			filenames: []string{"./testdata/.github/workflows/github-workflow-permissions-secevent-deployments.yaml"},
@@ -422,7 +422,7 @@ func TestGithubTokenPermissions(t *testing.T) {
 				NumberOfInfo:  1, // read-only top-level permissions
 				NumberOfDebug: 4, // This is 4 + (number of actions = 0)
 			},
-		},*/
+		},
 	}
 	for _, tt := range tests {
 		tt := tt // Re-initializing variable so it is not changed while executing the closure below
