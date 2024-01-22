@@ -13,7 +13,7 @@
 // limitations under the License.
 
 //nolint:stylecheck
-package hasGithubWorkflowPermissionNone
+package hasGitHubWorkflowPermissionRead
 
 import (
 	"embed"
@@ -28,7 +28,7 @@ import (
 //go:embed *.yml
 var fs embed.FS
 
-const Probe = "hasGithubWorkflowPermissionNone"
+const Probe = "hasGitHubWorkflowPermissionRead"
 
 func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	if raw == nil {
@@ -39,7 +39,7 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	var findings []finding.Finding
 
 	for _, r := range results.TokenPermissions {
-		if r.Type != checker.PermissionLevelNone {
+		if r.Type != checker.PermissionLevelRead {
 			continue
 		}
 

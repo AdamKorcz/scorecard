@@ -13,7 +13,7 @@
 // limitations under the License.
 
 //nolint:stylecheck
-package hasGithubWorkflowPermissionNone
+package hasGitHubWorkflowPermissionRead
 
 import (
 	"testing"
@@ -29,7 +29,6 @@ import (
 
 func Test_Run(t *testing.T) {
 	t.Parallel()
-
 	tests := []permissions.TestData{
 		{
 			Name: "No Tokens",
@@ -49,7 +48,7 @@ func Test_Run(t *testing.T) {
 					NumTokens: 1,
 					TokenPermissions: []checker.TokenPermission{
 						{
-							Type: checker.PermissionLevelNone,
+							Type: checker.PermissionLevelRead,
 						},
 					},
 				},

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 //nolint:stylecheck
-package hasGithubWorkflowPermissionUnknown
+package hasGitHubWorkflowPermissionUndeclared
 
 /*import (
 	"testing"

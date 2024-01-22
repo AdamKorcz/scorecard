@@ -13,7 +13,7 @@
 // limitations under the License.
 
 //nolint:stylecheck
-package hasNoGithubWorkflowsWithUndeclaredPermissionsJob
+package hasGitHubWorkflowPermissionUndeclared
 
 import (
 	"embed"
@@ -28,7 +28,7 @@ import (
 //go:embed *.yml
 var fs embed.FS
 
-const Probe = "hasNoGithubWorkflowsWithUndeclaredPermissionsJob"
+const Probe = "hasGitHubWorkflowPermissionUndeclared"
 
 func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	if raw == nil {
@@ -38,31 +38,48 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	results := raw.TokenPermissionsResults
 	var findings []finding.Finding
 
-	if results.NumTokens == 0 {
-		f, err := finding.NewWith(fs, Probe,
-			"No token permissions found",
-			nil, finding.OutcomeNotAvailable)
-		if err != nil {
-			return nil, Probe, fmt.Errorf("create finding: %w", err)
-		}
-		findings = append(findings, *f)
-		return findings, Probe, nil
-	}
-
 	for _, r := range results.TokenPermissions {
-		if r.LocationType != nil && *r.LocationType != checker.PermissionLocationJob {
-			continue
-		}
 		if r.Type != checker.PermissionLevelUndeclared {
 			continue
 		}
-
-		// Create finding
-		f, err := permissions.CreateNegativeFinding(r, Probe, fs)
-		if err != nil {
-			return nil, Probe, fmt.Errorf("create finding: %w", err)
+		topLevel := 0
+		jobLevel := 0
+		if *r.LocationType == checker.PermissionLocationTop {
+			topLevel = 1
 		}
-		findings = append(findings, *f)
+		if *r.LocationType == checker.PermissionLocationJob {
+			jobLevel = 1
+		}
+		switch {
+		case r.LocationType == nil:
+			f, err := finding.NewWith(fs, Probe,
+				"no workflows with write permissions for 'all' at top level",
+				nil, finding.OutcomeNotAvailable)
+			if err != nil {
+				return nil, Probe, fmt.Errorf("create finding: %w", err)
+			}
+			findings = append(findings, *f)
+		case *r.LocationType == checker.PermissionLocationTop,
+			*r.LocationType == checker.PermissionLocationJob:
+			// Create finding
+			f, err := permissions.CreateNegativeFinding(r, Probe, fs)
+			if err != nil {
+				return nil, Probe, fmt.Errorf("create finding: %w", err)
+			}
+			f = f.WithValues(map[string]int{
+				"topLevel": topLevel,
+				"jobLevel": jobLevel,
+			})
+			findings = append(findings, *f)
+		default:
+			f, err := finding.NewWith(fs, Probe,
+				"no workflows with write permissions for 'all' at top level",
+				nil, finding.OutcomeNotApplicable)
+			if err != nil {
+				return nil, Probe, fmt.Errorf("create finding: %w", err)
+			}
+			findings = append(findings, *f)
+		}
 	}
 
 	if len(findings) == 0 {

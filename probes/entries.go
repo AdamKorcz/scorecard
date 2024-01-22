@@ -36,10 +36,10 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasDangerousWorkflowScriptInjection"
 	"github.com/ossf/scorecard/v4/probes/hasDangerousWorkflowUntrustedCheckout"
 	"github.com/ossf/scorecard/v4/probes/hasFSFOrOSIApprovedLicense"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUndeclared"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
+	"github.com/ossf/scorecard/v4/probes/hasGitHubWorkflowPermissionNone"
+	"github.com/ossf/scorecard/v4/probes/hasGitHubWorkflowPermissionRead"
+	"github.com/ossf/scorecard/v4/probes/hasGitHubWorkflowPermissionUndeclared"
+	"github.com/ossf/scorecard/v4/probes/hasGitHubWorkflowPermissionUnknown"
 	"github.com/ossf/scorecard/v4/probes/hasLicenseFile"
 	"github.com/ossf/scorecard/v4/probes/hasLicenseFileAtTopDir"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsJob"
@@ -177,10 +177,10 @@ var (
 		hasNoGitHubWorkflowPermissionWritePackagesTop.Run,
 		hasNoGitHubWorkflowPermissionWriteSecurityEventsTop.Run,
 		hasNoGitHubWorkflowPermissionWriteStatusesTop.Run,
-		hasGithubWorkflowPermissionUnknown.Run,
-		hasGithubWorkflowPermissionNone.Run,
-		hasGithubWorkflowPermissionRead.Run,
-		hasGithubWorkflowPermissionUndeclared.Run,
+		hasGitHubWorkflowPermissionUnknown.Run,
+		hasGitHubWorkflowPermissionNone.Run,
+		hasGitHubWorkflowPermissionRead.Run,
+		hasGitHubWorkflowPermissionUndeclared.Run,
 		hasNoGitHubWorkflowPermissionWriteAllJob.Run,
 		hasNoGitHubWorkflowPermissionWriteSecurityEventsJob.Run,
 		hasNoGitHubWorkflowPermissionWriteContentsJob.Run,

@@ -20,10 +20,10 @@ import (
 	"github.com/ossf/scorecard/v4/checker"
 	sce "github.com/ossf/scorecard/v4/errors"
 	"github.com/ossf/scorecard/v4/finding"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUndeclared"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
+	"github.com/ossf/scorecard/v4/probes/hasGitHubWorkflowPermissionNone"
+	"github.com/ossf/scorecard/v4/probes/hasGitHubWorkflowPermissionRead"
+	"github.com/ossf/scorecard/v4/probes/hasGitHubWorkflowPermissionUndeclared"
+	"github.com/ossf/scorecard/v4/probes/hasGitHubWorkflowPermissionUnknown"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsJob"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsTop"
 	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllJob"
@@ -56,10 +56,10 @@ func TokenPermissions(name string,
 		hasNoGitHubWorkflowPermissionWritePackagesTop.Probe,
 		hasNoGitHubWorkflowPermissionWriteSecurityEventsTop.Probe,
 		hasNoGitHubWorkflowPermissionWriteStatusesTop.Probe,
-		hasGithubWorkflowPermissionUnknown.Probe,
-		hasGithubWorkflowPermissionNone.Probe,
-		hasGithubWorkflowPermissionRead.Probe,
-		hasGithubWorkflowPermissionUndeclared.Probe,
+		hasGitHubWorkflowPermissionUnknown.Probe,
+		hasGitHubWorkflowPermissionNone.Probe,
+		hasGitHubWorkflowPermissionRead.Probe,
+		hasGitHubWorkflowPermissionUndeclared.Probe,
 		hasNoGitHubWorkflowPermissionWriteAllJob.Probe,
 		hasNoGitHubWorkflowPermissionWriteSecurityEventsJob.Probe,
 		hasNoGitHubWorkflowPermissionWriteActionsJob.Probe,
@@ -119,7 +119,7 @@ func TokenPermissions(name string,
 		addProbeToMaps(fPath, undeclaredPermissions, hasWritePermissions)
 
 		switch f.Probe {
-		case hasGithubWorkflowPermissionUndeclared.Probe:
+		case hasGitHubWorkflowPermissionUndeclared.Probe:
 			score = updateScoreAndMapFromUndeclared(undeclaredPermissions,
 				hasWritePermissions, f, score, dl)
 		case hasNoGitHubWorkflowPermissionWriteAllTop.Probe:
@@ -218,7 +218,7 @@ func updateScoreFromUndeclaredTop(undeclaredPermissions map[string]map[string]bo
 }
 
 func notAvailableOrNotApplicable(f *finding.Finding, dl checker.DetailLogger) bool {
-	if f.Probe == hasGithubWorkflowPermissionUndeclared.Probe {
+	if f.Probe == hasGitHubWorkflowPermissionUndeclared.Probe {
 		if f.Outcome == finding.OutcomeNotAvailable {
 			return true
 		} else if f.Outcome == finding.OutcomeNotApplicable {
@@ -277,11 +277,11 @@ func addProbeToMaps(fPath string, hasWritePermissions, undeclaredPermissions map
 // logAndReduceScore represents these cases.
 func logAndReduceScore(f *finding.Finding, dl checker.DetailLogger, score float32) float32 {
 	switch f.Probe {
-	case hasGithubWorkflowPermissionNone.Probe, hasGithubWorkflowPermissionRead.Probe:
+	case hasGitHubWorkflowPermissionNone.Probe, hasGitHubWorkflowPermissionRead.Probe:
 		dl.Info(&checker.LogMessage{
 			Finding: f,
 		})
-	case hasGithubWorkflowPermissionUnknown.Probe:
+	case hasGitHubWorkflowPermissionUnknown.Probe:
 		dl.Debug(&checker.LogMessage{
 			Finding: f,
 		})
