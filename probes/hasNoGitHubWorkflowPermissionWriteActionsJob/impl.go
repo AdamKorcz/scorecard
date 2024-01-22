@@ -29,7 +29,8 @@ var fs embed.FS
 const Probe = "hasNoGitHubWorkflowPermissionWriteActionsJob"
 
 func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
+	//nolint:wrapcheck
 	return permissions.CreateFindings(fs, raw, checker.PermissionLocationJob,
-									  checker.PermissionLevelWrite, Probe,
-									  "actions", "", "")
+		checker.PermissionLevelWrite, Probe,
+		"actions", "", "")
 }

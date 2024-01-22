@@ -36,8 +36,28 @@ import (
 	"github.com/ossf/scorecard/v4/probes/hasDangerousWorkflowScriptInjection"
 	"github.com/ossf/scorecard/v4/probes/hasDangerousWorkflowUntrustedCheckout"
 	"github.com/ossf/scorecard/v4/probes/hasFSFOrOSIApprovedLicense"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUndeclared"
+	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
 	"github.com/ossf/scorecard/v4/probes/hasLicenseFile"
 	"github.com/ossf/scorecard/v4/probes/hasLicenseFileAtTopDir"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesJob"
+	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
 	"github.com/ossf/scorecard/v4/probes/hasOSVVulnerabilities"
 	"github.com/ossf/scorecard/v4/probes/hasOpenSSFBadge"
 	"github.com/ossf/scorecard/v4/probes/hasRecentCommits"
@@ -62,28 +82,6 @@ import (
 	"github.com/ossf/scorecard/v4/probes/toolPyUpInstalled"
 	"github.com/ossf/scorecard/v4/probes/toolRenovateInstalled"
 	"github.com/ossf/scorecard/v4/probes/webhooksUseSecrets"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesTop"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteChecksJob"
-
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteDeploymentsJob"
-
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteStatusesJob"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUnknown"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionNone"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionRead"
-	"github.com/ossf/scorecard/v4/probes/hasGithubWorkflowPermissionUndeclared"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteAllJob"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteSecurityEventsJob"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteContentsJob"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWritePackagesJob"
-	"github.com/ossf/scorecard/v4/probes/hasNoGitHubWorkflowPermissionWriteActionsJob"
 )
 
 // ProbeImpl is the implementation of a probe.
@@ -170,7 +168,7 @@ var (
 		releasesAreSigned.Run,
 		releasesHaveProvenance.Run,
 	}
-	TokenPermissions = []ProbeImpl{		
+	TokenPermissions = []ProbeImpl{
 		hasNoGitHubWorkflowPermissionWriteActionsTop.Run,
 		hasNoGitHubWorkflowPermissionWriteAllTop.Run,
 		hasNoGitHubWorkflowPermissionWriteChecksTop.Run,

@@ -60,16 +60,17 @@ func TokenPermissions(c *checker.CheckRequest) (checker.TokenPermissionsData, er
 		Pattern:       ".github/workflows/*",
 		CaseSensitive: false,
 	}, validateGitHubActionTokenPermissions, &data)
-            
-    for i := range data.results.TokenPermissions {
-        rr := &data.results.TokenPermissions[i]
-        remdtion, _ := remediation.New(c)
-        ruleRemdtion := &rule.Remediation {
-        	Branch: remdtion.Branch,
-			Repo: remdtion.Repo,
-        }
-        rr.Remediation = ruleRemdtion
-    }
+
+	for i := range data.results.TokenPermissions {
+		rr := &data.results.TokenPermissions[i]
+		//nolint:errcheck
+		remdtion, _ := remediation.New(c)
+		ruleRemdtion := &rule.Remediation{
+			Branch: remdtion.Branch,
+			Repo:   remdtion.Repo,
+		}
+		rr.Remediation = ruleRemdtion
+	}
 
 	return data.results, err
 }
@@ -116,7 +117,7 @@ var validateGitHubActionTokenPermissions fileparser.DoWhileTrueOnFileContent = f
 	// 2. Run-level permission definitions,
 	// see https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idpermissions.
 	ignoredPermissions := createIgnoredPermissions(workflow, path, pdata)
-	//fmt.Println("len pdata after createIgnoredPermissions: ", len(pdata.results.TokenPermissions))
+
 	if err := validatejobLevelPermissions(workflow, path, pdata, ignoredPermissions); err != nil {
 		return false, err
 	}
@@ -240,7 +241,6 @@ func validatePermissions(permissions *actionlint.Permissions, permLoc checker.Pe
 		val := permissions.All.Value
 		lineNumber := fileparser.GetLineNumber(permissions.All.Pos)
 		if !strings.EqualFold(val, "read-all") && val != "" {
-			//fmt.Println("val: ", val)
 			pdata.results.TokenPermissions = append(pdata.results.TokenPermissions,
 				checker.TokenPermission{
 					File: &checker.File{

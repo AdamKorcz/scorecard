@@ -48,7 +48,6 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 		return findings, Probe, nil
 	}
 
-
 	for _, r := range results.TokenPermissions {
 		if r.LocationType != nil && *r.LocationType != checker.PermissionLocationTop {
 			continue

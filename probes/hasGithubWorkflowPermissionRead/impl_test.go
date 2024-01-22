@@ -29,7 +29,7 @@ import (
 
 func Test_Run(t *testing.T) {
 	t.Parallel()
-	tests := []permissions.TestData {
+	tests := []permissions.TestData{
 		{
 			Name: "No Tokens",
 			Raw: &checker.RawResults{
@@ -46,9 +46,9 @@ func Test_Run(t *testing.T) {
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
-							Type:         checker.PermissionLevelRead,
+							Type: checker.PermissionLevelRead,
 						},
 					},
 				},
@@ -62,9 +62,9 @@ func Test_Run(t *testing.T) {
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
-							Type:         checker.PermissionLevelUnknown,
+							Type: checker.PermissionLevelUnknown,
 						},
 					},
 				},

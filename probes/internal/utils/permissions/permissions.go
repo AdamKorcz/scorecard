@@ -8,7 +8,6 @@ import (
 	"github.com/ossf/scorecard/v4/checker"
 	sce "github.com/ossf/scorecard/v4/errors"
 	"github.com/ossf/scorecard/v4/finding"
-
 	"github.com/ossf/scorecard/v4/probes/internal/utils/uerror"
 )
 
@@ -41,45 +40,49 @@ func CreateText(t checker.TokenPermission) (string, error) {
 		*t.Name, *t.Value), nil
 }
 
-func CreateNegativeFinding(r checker.TokenPermission, Probe string, fs embed.FS) (*finding.Finding, error) {
-		// Create finding
-		text, err := CreateText(r)
-		if err != nil {
-			return nil, fmt.Errorf("create finding: %w", err)
-		}
-		f, err := finding.NewWith(fs, Probe,
-			text, nil, finding.OutcomeNegative)
-		if err != nil {
-			return nil, fmt.Errorf("create finding: %w", err)
-		}
+func CreateNegativeFinding(r checker.TokenPermission,
+	probe string,
+	fs embed.FS,
+) (*finding.Finding, error) {
+	// Create finding
+	text, err := CreateText(r)
+	if err != nil {
+		return nil, fmt.Errorf("create finding: %w", err)
+	}
+	f, err := finding.NewWith(fs, probe,
+		text, nil, finding.OutcomeNegative)
+	if err != nil {
+		return nil, fmt.Errorf("create finding: %w", err)
+	}
 
-		// Create Location
-		var loc *finding.Location
-		if r.File != nil {
-			loc = &finding.Location{
-				Type:      r.File.Type,
-				Path:      r.File.Path,
-				LineStart: newUint(r.File.Offset),
-			}
-			if r.File.Snippet != "" {
-				loc.Snippet = newStr(r.File.Snippet)
-			}
-			f = f.WithLocation(loc)
-			f = f.WithRemediationMetadata(map[string]string{
-				"repo":     r.Remediation.Repo,
-				"branch":   r.Remediation.Branch,
-				"workflow": strings.TrimPrefix(f.Location.Path, ".github/workflows/"),
-			})
+	// Create Location
+	var loc *finding.Location
+	if r.File != nil {
+		loc = &finding.Location{
+			Type:      r.File.Type,
+			Path:      r.File.Path,
+			LineStart: newUint(r.File.Offset),
 		}
-		return f, nil
+		if r.File.Snippet != "" {
+			loc.Snippet = newStr(r.File.Snippet)
+		}
+		f = f.WithLocation(loc)
+		f = f.WithRemediationMetadata(map[string]string{
+			"repo":     r.Remediation.Repo,
+			"branch":   r.Remediation.Branch,
+			"workflow": strings.TrimPrefix(f.Location.Path, ".github/workflows/"),
+		})
+	}
+	return f, nil
 }
 
 func CreateFindings(fs embed.FS,
-					raw *checker.RawResults,
-					locationType checker.PermissionLocation,
-					permissionLevel checker.PermissionLevel,
-					probe, tokenName, negativeOutcomeMsg,
-					positiveOutcomeMsg string) ([]finding.Finding, string, error) {
+	raw *checker.RawResults,
+	locationType checker.PermissionLocation,
+	permissionLevel checker.PermissionLevel,
+	probe, tokenName, negativeOutcomeMsg,
+	positiveOutcomeMsg string,
+) ([]finding.Finding, string, error) {
 	if raw == nil {
 		return nil, "", fmt.Errorf("%w: raw", uerror.ErrNil)
 	}
@@ -122,7 +125,9 @@ func CreateFindings(fs embed.FS,
 
 	if len(findings) == 0 {
 		f, err := finding.NewWith(fs, probe,
-			fmt.Sprintf("no workflows with write permissions for '%v' at '%v'", tokenName, permissionLevel),
+			fmt.Sprintf("no workflows with write permissions for '%v' at '%v'",
+				tokenName,
+				permissionLevel),
 			nil, finding.OutcomePositive)
 		if err != nil {
 			return nil, probe, fmt.Errorf("create finding: %w", err)
@@ -144,12 +149,15 @@ func newStr(s string) *string {
 
 type TestData struct {
 	Name     string
+	Err      error
 	Raw      *checker.RawResults
 	Outcomes []finding.Outcome
-	Err      error
 }
 
-func GetTests(locationType checker.PermissionLocation, permissionType checker.PermissionLevel, tokenName string) []TestData {
+func GetTests(locationType checker.PermissionLocation,
+	permissionType checker.PermissionLevel,
+	tokenName string,
+) []TestData {
 	name := tokenName // Should come from each probe test.
 	wrongName := "wrongName"
 	value := "value"
@@ -159,8 +167,8 @@ func GetTests(locationType checker.PermissionLocation, permissionType checker.Pe
 	} else {
 		wrongPermissionLocation = checker.PermissionLocationTop
 	}
-	//nolint:govet
-	return []TestData {
+
+	return []TestData{
 		{
 			Name: "No Tokens",
 			Raw: &checker.RawResults{
@@ -177,7 +185,7 @@ func GetTests(locationType checker.PermissionLocation, permissionType checker.Pe
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &wrongName,
@@ -197,7 +205,7 @@ func GetTests(locationType checker.PermissionLocation, permissionType checker.Pe
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &name,
@@ -217,7 +225,7 @@ func GetTests(locationType checker.PermissionLocation, permissionType checker.Pe
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 2,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &name,
@@ -244,7 +252,7 @@ func GetTests(locationType checker.PermissionLocation, permissionType checker.Pe
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &name,
@@ -265,7 +273,7 @@ func GetTests(locationType checker.PermissionLocation, permissionType checker.Pe
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &name,
@@ -285,7 +293,7 @@ func GetTests(locationType checker.PermissionLocation, permissionType checker.Pe
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &wrongPermissionLocation,
 							Name:         &name,
@@ -305,7 +313,7 @@ func GetTests(locationType checker.PermissionLocation, permissionType checker.Pe
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &wrongPermissionLocation,
 							Name:         &name,

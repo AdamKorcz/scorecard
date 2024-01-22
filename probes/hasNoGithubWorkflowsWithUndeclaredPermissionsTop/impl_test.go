@@ -22,9 +22,9 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/ossf/scorecard/v4/checker"
-	"github.com/ossf/scorecard/v4/probes/internal/utils/test"
-	"github.com/ossf/scorecard/v4/probes/internal/utils/permissions"
 	"github.com/ossf/scorecard/v4/finding"
+	"github.com/ossf/scorecard/v4/probes/internal/utils/permissions"
+	"github.com/ossf/scorecard/v4/probes/internal/utils/test"
 )
 
 func Test_Run(t *testing.T) {
@@ -32,7 +32,7 @@ func Test_Run(t *testing.T) {
 	locationType := checker.PermissionLocationTop
 	wrongName := "wrongName"
 	name := "name"
-	permissionType := checker.PermissionLevelUndeclared	
+	permissionType := checker.PermissionLevelUndeclared
 	var wrongPermissionLocation checker.PermissionLocation
 	if locationType == checker.PermissionLocationTop {
 		wrongPermissionLocation = checker.PermissionLocationJob
@@ -41,7 +41,7 @@ func Test_Run(t *testing.T) {
 	}
 	value := "value"
 
-	tests := []permissions.TestData {
+	tests := []permissions.TestData{
 		{
 			Name: "No Tokens",
 			Raw: &checker.RawResults{
@@ -58,7 +58,7 @@ func Test_Run(t *testing.T) {
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &wrongName,
@@ -78,7 +78,7 @@ func Test_Run(t *testing.T) {
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &name,
@@ -98,7 +98,7 @@ func Test_Run(t *testing.T) {
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 2,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &name,
@@ -125,7 +125,7 @@ func Test_Run(t *testing.T) {
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &name,
@@ -145,7 +145,7 @@ func Test_Run(t *testing.T) {
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &locationType,
 							Name:         &name,
@@ -165,7 +165,7 @@ func Test_Run(t *testing.T) {
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &wrongPermissionLocation,
 							Name:         &name,
@@ -185,7 +185,7 @@ func Test_Run(t *testing.T) {
 			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
 					NumTokens: 1,
-					TokenPermissions: []checker.TokenPermission {
+					TokenPermissions: []checker.TokenPermission{
 						{
 							LocationType: &wrongPermissionLocation,
 							Name:         &name,
@@ -201,7 +201,7 @@ func Test_Run(t *testing.T) {
 			},
 		},
 	}
-	
+
 	for _, tt := range tests {
 		tt := tt // Re-initializing variable so it is not changed while executing the closure below
 		t.Run(tt.Name, func(t *testing.T) {

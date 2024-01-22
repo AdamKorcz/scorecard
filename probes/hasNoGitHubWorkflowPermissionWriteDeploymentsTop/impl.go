@@ -17,12 +17,10 @@ package hasNoGitHubWorkflowPermissionWriteDeploymentsTop
 
 import (
 	"embed"
-	//"fmt"
 
 	"github.com/ossf/scorecard/v4/checker"
 	"github.com/ossf/scorecard/v4/finding"
 	"github.com/ossf/scorecard/v4/probes/internal/utils/permissions"
-	//"github.com/ossf/scorecard/v4/probes/internal/utils/uerror"
 )
 
 //go:embed *.yml
@@ -31,7 +29,8 @@ var fs embed.FS
 const Probe = "hasNoGitHubWorkflowPermissionWriteDeploymentsTop"
 
 func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
+	//nolint:wrapcheck
 	return permissions.CreateFindings(fs, raw, checker.PermissionLocationTop,
-									  checker.PermissionLevelWrite, Probe,
-									  "deployments", "", "")
+		checker.PermissionLevelWrite, Probe,
+		"deployments", "", "")
 }

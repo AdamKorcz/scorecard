@@ -82,7 +82,6 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	return findings, Probe, nil
 }
 
-
 // avoid memory aliasing by returning a new copy.
 func newUint(u uint) *uint {
 	return &u
