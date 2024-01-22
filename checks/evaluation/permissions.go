@@ -105,7 +105,7 @@ func TokenPermissions(name string,
 		// Log workflows with "none" and "read" permissions.
 		if f.Outcome == finding.OutcomePositive &&
 			(f.Probe == hasGitHubWorkflowPermissionNone.Probe ||
-			 f.Probe == hasGitHubWorkflowPermissionRead.Probe) {
+				f.Probe == hasGitHubWorkflowPermissionRead.Probe) {
 			dl.Info(&checker.LogMessage{
 				Finding: f,
 			})
@@ -187,7 +187,8 @@ func TokenPermissions(name string,
 }
 
 func logIfNoWritePermissionsFound(hasWritePermissions map[string]map[string]bool,
-	dl checker.DetailLogger) {
+	dl checker.DetailLogger,
+) {
 	foundWritePermissions := false
 	for _, isWritePermission := range hasWritePermissions["jobLevel"] {
 		if isWritePermission {

@@ -80,8 +80,7 @@ func CreateFindings(fs embed.FS,
 	raw *checker.RawResults,
 	locationType checker.PermissionLocation,
 	permissionLevel checker.PermissionLevel,
-	probe, tokenName, negativeOutcomeMsg,
-	positiveOutcomeMsg string,
+	probe, tokenName string,
 ) ([]finding.Finding, string, error) {
 	if raw == nil {
 		return nil, "", fmt.Errorf("%w: raw", uerror.ErrNil)

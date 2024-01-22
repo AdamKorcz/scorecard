@@ -38,6 +38,17 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	results := raw.TokenPermissionsResults
 	var findings []finding.Finding
 
+	if results.NumTokens == 0 {
+		f, err := finding.NewWith(fs, Probe,
+			"No token permissions found",
+			nil, finding.OutcomeNotAvailable)
+		if err != nil {
+			return nil, Probe, fmt.Errorf("create finding: %w", err)
+		}
+		findings = append(findings, *f)
+		return findings, Probe, nil
+	}
+
 	for _, r := range results.TokenPermissions {
 		if r.Type != checker.PermissionLevelUndeclared {
 			continue
@@ -53,7 +64,7 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 		switch {
 		case r.LocationType == nil:
 			f, err := finding.NewWith(fs, Probe,
-				"no workflows with write permissions for 'all' at top level",
+				"could not determine the location type",
 				nil, finding.OutcomeNotAvailable)
 			if err != nil {
 				return nil, Probe, fmt.Errorf("create finding: %w", err)
@@ -73,7 +84,7 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 			findings = append(findings, *f)
 		default:
 			f, err := finding.NewWith(fs, Probe,
-				"no workflows with write permissions for 'all' at top level",
+				"could not determine the location type",
 				nil, finding.OutcomeNotApplicable)
 			if err != nil {
 				return nil, Probe, fmt.Errorf("create finding: %w", err)
@@ -84,7 +95,7 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 
 	if len(findings) == 0 {
 		f, err := finding.NewWith(fs, Probe,
-			"no workflows with write permissions for 'all' at top level",
+			"project has no workflows with undeclared permissions",
 			nil, finding.OutcomePositive)
 		if err != nil {
 			return nil, Probe, fmt.Errorf("create finding: %w", err)

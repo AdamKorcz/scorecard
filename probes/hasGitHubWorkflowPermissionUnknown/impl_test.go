@@ -15,7 +15,7 @@
 //nolint:stylecheck
 package hasGitHubWorkflowPermissionUnknown
 
-/*import (
+import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -23,127 +23,69 @@ package hasGitHubWorkflowPermissionUnknown
 
 	"github.com/ossf/scorecard/v4/checker"
 	"github.com/ossf/scorecard/v4/finding"
+	"github.com/ossf/scorecard/v4/probes/internal/utils/permissions"
 	"github.com/ossf/scorecard/v4/probes/internal/utils/test"
 )
 
 func Test_Run(t *testing.T) {
 	t.Parallel()
-	name := "name"
-	all := "all"
-	value := "value"
-	//msg := "msg"
 	permLoc := checker.PermissionLocationTop
-	//nolint:govet
-	tests := []struct {
-		name     string
-		raw      *checker.RawResults
-		outcomes []finding.Outcome
-		err      error
-	}{
+	value := "value"
+	tests := []permissions.TestData{
 		{
-			name: "Read permission.",
-			raw: &checker.RawResults{
+			Name: "No Tokens",
+			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
-					TokenPermissions: []checker.TokenPermission {
-						{
-							LocationType: &permLoc,
-							Name:         &name,
-							Value:        &value,
-							Msg:          nil,
-							Type:         checker.PermissionLevelRead,
-						},
-					},
+					NumTokens: 0,
 				},
 			},
-			outcomes: []finding.Outcome{
-				finding.OutcomePositive,
+			Outcomes: []finding.Outcome{
+				finding.OutcomeNotAvailable,
 			},
 		},
 		{
-			name: "Write permission",
-			raw: &checker.RawResults{
+			Name: "Correct permission level",
+			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
-					TokenPermissions: []checker.TokenPermission {
+					NumTokens: 1,
+					TokenPermissions: []checker.TokenPermission{
 						{
-							LocationType: &permLoc,
-							Name:         &name,
-							Value:        &value,
-							Msg:          nil,
-							Type:         checker.PermissionLevelWrite,
-						},
-					},
-				},
-			},
-			outcomes: []finding.Outcome{
-				finding.OutcomeNegative,
-			},
-		},
-		{
-			name: "None permission",
-			raw: &checker.RawResults{
-				TokenPermissionsResults: checker.TokenPermissionsData{
-					TokenPermissions: []checker.TokenPermission {
-						{
-							LocationType: &permLoc,
-							Name:         &name,
-							Value:        &value,
-							Msg:          nil,
-							Type:         checker.PermissionLevelNone,
-						},
-					},
-				},
-			},
-			outcomes: []finding.Outcome{
-				finding.OutcomePositive,
-			},
-		},
-		{
-			name: "Unknown permission",
-			raw: &checker.RawResults{
-				TokenPermissionsResults: checker.TokenPermissionsData{
-					TokenPermissions: []checker.TokenPermission {
-						{
-							LocationType: &permLoc,
-							Name:         &name,
-							Value:        &value,
-							Msg:          nil,
 							Type:         checker.PermissionLevelUnknown,
+							LocationType: &permLoc,
+							Value:        &value,
 						},
 					},
 				},
 			},
-			outcomes: []finding.Outcome{
-				finding.OutcomeError,
+			Outcomes: []finding.Outcome{
+				finding.OutcomeNegative,
 			},
 		},
 		{
-			name: "Undeclared permission",
-			raw: &checker.RawResults{
+			Name: "Incorrect permission level",
+			Raw: &checker.RawResults{
 				TokenPermissionsResults: checker.TokenPermissionsData{
-					TokenPermissions: []checker.TokenPermission {
+					NumTokens: 1,
+					TokenPermissions: []checker.TokenPermission{
 						{
-							LocationType: &permLoc,
-							Name:         &all,
-							Value:        &value,
-							Msg:          nil,
-							Type:         checker.PermissionLevelUndeclared,
+							Type: checker.PermissionLevelRead,
 						},
 					},
 				},
 			},
-			outcomes: []finding.Outcome{
-				finding.OutcomeNegative,
+			Outcomes: []finding.Outcome{
+				finding.OutcomePositive,
 			},
 		},
 	}
 	for _, tt := range tests {
 		tt := tt // Re-initializing variable so it is not changed while executing the closure below
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.Name, func(t *testing.T) {
 			t.Parallel()
 
-			findings, s, err := Run(tt.raw)
-			if !cmp.Equal(tt.err, err, cmpopts.EquateErrors()) {
-				t.Errorf("mismatch (-want +got):\n%s", cmp.Diff(tt.err, err, cmpopts.EquateErrors()))
+			findings, s, err := Run(tt.Raw)
+			if !cmp.Equal(tt.Err, err, cmpopts.EquateErrors()) {
+				t.Errorf("mismatch (-want +got):\n%s", cmp.Diff(tt.Err, err, cmpopts.EquateErrors()))
 			}
 			if err != nil {
 				return
@@ -151,7 +93,7 @@ func Test_Run(t *testing.T) {
 			if diff := cmp.Diff(Probe, s); diff != "" {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}
-			test.AssertOutcomes(t, findings, tt.outcomes)
+			test.AssertOutcomes(t, findings, tt.Outcomes)
 		})
 	}
-}*/
+}

@@ -32,5 +32,5 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	//nolint:wrapcheck
 	return permissions.CreateFindings(fs, raw, checker.PermissionLocationJob,
 		checker.PermissionLevelWrite, Probe,
-		"deployments", "", "")
+		"deployments")
 }
