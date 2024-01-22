@@ -102,6 +102,15 @@ func TokenPermissions(name string,
 	for i := range findings {
 		f := &findings[i]
 
+		// Log workflows with "none" and "read" permissions.
+		if f.Outcome == finding.OutcomePositive &&
+			(f.Probe == hasGitHubWorkflowPermissionNone.Probe ||
+			 f.Probe == hasGitHubWorkflowPermissionRead.Probe) {
+			dl.Info(&checker.LogMessage{
+				Finding: f,
+			})
+		}
+
 		if notAvailableOrNotApplicable(f, dl) {
 			return checker.CreateInconclusiveResult(name, "Token permissions are not available")
 		}
@@ -277,10 +286,6 @@ func addProbeToMaps(fPath string, hasWritePermissions, undeclaredPermissions map
 // logAndReduceScore represents these cases.
 func logAndReduceScore(f *finding.Finding, dl checker.DetailLogger, score float32) float32 {
 	switch f.Probe {
-	case hasGitHubWorkflowPermissionNone.Probe, hasGitHubWorkflowPermissionRead.Probe:
-		dl.Info(&checker.LogMessage{
-			Finding: f,
-		})
 	case hasGitHubWorkflowPermissionUnknown.Probe:
 		dl.Debug(&checker.LogMessage{
 			Finding: f,

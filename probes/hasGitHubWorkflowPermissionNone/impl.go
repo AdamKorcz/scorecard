@@ -46,7 +46,7 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 		// Create finding
 		f, err := finding.NewWith(fs, Probe,
 			"no workflows with write permissions for 'all' at top level",
-			nil, finding.OutcomeNegative)
+			nil, finding.OutcomePositive)
 		if err != nil {
 			return nil, Probe, fmt.Errorf("create finding: %w", err)
 		}
@@ -73,7 +73,7 @@ func Run(raw *checker.RawResults) ([]finding.Finding, string, error) {
 	if len(findings) == 0 {
 		f, err := finding.NewWith(fs, Probe,
 			"no workflows with write permissions for 'all' at top level",
-			nil, finding.OutcomePositive)
+			nil, finding.OutcomeNotApplicable)
 		if err != nil {
 			return nil, Probe, fmt.Errorf("create finding: %w", err)
 		}

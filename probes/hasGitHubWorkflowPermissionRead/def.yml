@@ -13,14 +13,15 @@
 # limitations under the License.
 
 id: hasGitHubWorkflowPermissionRead
-short: Checks that GitHub workflows do not have default write permissions
+short: Checks that the project has any Workflows with permission level "read".
 motivation: >
-  If no permissions are declared, a workflow's GitHub token's permissions default to write for all scopes.
-  This include write permissions to push to the repository, to read encrypted secrets, etc.
-  For more information, see https://docs.github.com/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token. 
+  Setting permission levels to none is positive if the project does not need write permisions for the given workflow.
+  It prevents write actions against the given resource type.
 implementation: >
-  The rule is implemented by checking whether the `permissions` keyword is defined at the top of the workflow,
-  and that no write permissions are given.
+  The probe checks for workflows with "read" set as the permission level.
+outcome:
+  - The probe returns 1 positive outcome per workflow with "read" set as its permission level.
+  - The probe returns 1 OutcomeNotApplicable if no workflows have permission level set to "read"
 remediation:
   effort: Low
   text:
